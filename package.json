@@ -1,0 +1,13 @@
+{
+  "name": "bringmine-shop",
+  "version": "1.0.0",
+  "description": "BringMine - Your All-in-One Marketplace",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^7.3.0"
+  }
+}
