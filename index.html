@@ -1629,9 +1629,121 @@ select.seller-input {
     
 </head>
 <body>
+<!-- Splash Screen -->
+<div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#ec4899;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease;">
+    
+    <!-- Logo Image -->
+    <div style="text-align:center;animation:pulseSplash 1.5s ease-in-out infinite;">
+        <div style="width:130px;height:130px;background:#ec4899;border-radius:35px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px auto;box-shadow:0 10px 40px rgba(0,0,0,0.25);overflow:hidden;">
+            <img src="splashh.jpg" alt="BRINGMINE" style="width:200%;height:85%;object-fit:contain;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:60px;>🛍️</span>';">
+        </div>
+        
+        
+    </div>
+    
+    <!-- Loading Bar -->
+    <div style="width:180px;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin-top:36px;overflow:hidden;">
+        <div id="splashProgress" style="width:0%;height:100%;background:white;border-radius:2px;transition:width 0.3s ease;"></div>
+    </div>
+    
+    <!-- Tagline -->
+    <p style="color:rgba(255,255,255,0.75);font-size:16px;margin-top:20px;text-align:center;max-width:260px;"><b>Your Local Marketplace<br>Delivered to Your Doorstep </b></p>
+</div>
 
+<style>
+@keyframes pulseSplash {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+</style>
 <script>
+// ==============================================
+// SPLASH SCREEN CONTROLLER
+// ==============================================
 
+var splashProgress = 0;
+var splashInterval = null;
+var splashFinished = false;
+
+function startSplashScreen() {
+    var progressBar = document.getElementById('splashProgress');
+    if (!progressBar) return;
+    
+    splashProgress = 0;
+    splashFinished = false;
+    
+    splashInterval = setInterval(function() {
+        if (splashFinished) return;
+        
+        if (splashProgress < 60) {
+            splashProgress += Math.random() * 15;
+        } else if (splashProgress < 85) {
+            splashProgress += Math.random() * 5;
+        } else if (splashProgress < 98) {
+            splashProgress += Math.random() * 2;
+        }
+        
+        if (splashProgress > 98) splashProgress = 98;
+        
+        if (progressBar) {
+            progressBar.style.width = splashProgress + '%';
+        }
+    }, 200);
+}
+
+function finishSplashScreen() {
+    if (splashFinished) return;
+    splashFinished = true;
+    
+    if (splashInterval) {
+        clearInterval(splashInterval);
+        splashInterval = null;
+    }
+    
+    var progressBar = document.getElementById('splashProgress');
+    if (progressBar) {
+        progressBar.style.width = '100%';
+    }
+    
+    setTimeout(function() {
+        var splash = document.getElementById('splashScreen');
+        if (splash) {
+            splash.style.opacity = '0';
+            splash.style.pointerEvents = 'none';
+            
+            setTimeout(function() {
+                if (splash && splash.parentNode) {
+                    splash.parentNode.removeChild(splash);
+                }
+            }, 500);
+        }
+    }, 300);
+}
+
+// Start splash immediately
+startSplashScreen();
+
+// Listen for app ready
+window.addEventListener('load', function() {
+    var checkReady = setInterval(function() {
+        if (typeof renderHomeScreen === 'function' && typeof loadAllData === 'function') {
+            clearInterval(checkReady);
+            
+            try {
+                if (typeof loadAllData === 'function') loadAllData();
+            } catch(e) {}
+            
+            setTimeout(function() {
+                finishSplashScreen();
+            }, 8000);
+        }
+    }, 200);
+    
+    // Safety timeout - max 8 seconds
+    setTimeout(function() {
+        finishSplashScreen();
+    }, 8000);
+});
 var loginStep = 'role';
 var APP_STATE = { currentScreen: 'login' };
 let comparisonList = [];
@@ -2219,7 +2331,17 @@ function completeLogin(phone, role) {
             }
         }
     }
-    
+    // Source 3: localStorage backup (last resort)
+    if (!currentUser.nationalId && phone) {
+        var backupKey = 'bringmine_user_id_' + phone.replace(/[^0-9]/g, '');
+        var backupId = localStorage.getItem(backupKey);
+        if (backupId) {
+            currentUser.nationalId = backupId;
+            currentUser.idNumber = backupId;
+            currentUser.identityNumber = backupId;
+            console.log('✅ National ID loaded from localStorage backup');
+        }
+    }
     
     
     // Log ID status
@@ -2726,7 +2848,7 @@ if (!canAccessFinance()) { alert('Access denied.'); return; }
         '📊 Net Profit: ' + formatBWP(netProfit) +
         '</strong>' +
         '</div>' +
-        
+        '<button class="pink-btn-outline" onclick="showDirectorProductBrowser()" style="width:100%;margin-bottom:8px;">👑 Browse & Manage All Products</button>'+
         '<button onclick="closeCurrentModal()" style="width:100%;padding:8px;background:none;border:none;color:#9ca3af;margin-top:8px;cursor:pointer;">Close</button></div>';
     
     createModal({ id: 'finance_reports', title: '📊 Finance Reports', content: content, showCloseButton: true, width: '480px' });
@@ -4009,7 +4131,7 @@ window.saveNewPin = function() {
                     '3. Enter your phone number to recover\n\n';
             }
             
-            message += 'Contact support: support@sadcmall.co.bw';
+            message += 'Contact support: support@bringmine.shop';
             
             alert(message);
             document.getElementById('regNationalId')?.focus();
@@ -8458,6 +8580,22 @@ function secureSave(key, data) {
     var jsonStr = JSON.stringify(data);
     var encrypted = btoa(unescape(encodeURIComponent(jsonStr)));
     localStorage.setItem('bringmine_' + key, encrypted);
+    
+    // Sync to Supabase immediately if available
+    if (typeof saveToSupabase === 'function' && typeof IS_ONLINE !== 'undefined' && IS_ONLINE) {
+        var securityData = {
+            passphraseHash: localStorage.getItem('bringmine_director_passphrase_hash') || '',
+            a1Hash: localStorage.getItem('bringmine_director_a1_hash') || '',
+            a2Hash: localStorage.getItem('bringmine_director_a2_hash') || '',
+            q1: localStorage.getItem('bringmine_director_q1') || '',
+            q2: localStorage.getItem('bringmine_director_q2') || '',
+            directorPhone: localStorage.getItem('bringmine_director_phone') || '',
+            securityLog: localStorage.getItem('bringmine_security_log') || '[]',
+            resetAttempts: localStorage.getItem('bringmine_reset_attempts') || '[]',
+            emailQueue: localStorage.getItem('bringmine_email_queue') || '[]'
+        };
+        saveToSupabase('director_security', 'main', securityData);
+    }
 }
 
 function secureLoad(key, fallback) {
@@ -15364,6 +15502,26 @@ function compressAndSaveDocumentWithMeta(file, docId, country, authority, certif
                 stampReference: stampRef || ''
             };
             
+            sellerDocuments[currentUser.phone][docId] = {
+                fileData: compressedData,
+                fileName: file.name.replace(/\.\w+$/, '.jpg'),
+                fileType: 'image/jpeg',
+                originalSize: originalSize,
+                compressedSize: compressedSize,
+                savingsPercent: savingsPercent,
+                dimensions: width + 'x' + height,
+                status: 'pending',
+                uploadedAt: new Date().toISOString(),
+                certifiedBy: authority,
+                country: country,
+                certifiedDate: certifiedDate,
+                stampReference: stampRef || ''
+            };
+            
+            // Sync to Supabase
+            if (typeof saveToSupabase === 'function') {
+                saveToSupabase('seller_documents', currentUser.phone, sellerDocuments[currentUser.phone]);
+            }
             
             
             // Close modal and show result
@@ -15576,6 +15734,25 @@ function compressAndSaveDocument(file, docId) {
                 certifiedDate: new Date().toISOString().split('T')[0]
             };
             
+            sellerDocuments[currentUser.phone][docId] = {
+                fileData: compressedData,
+                fileName: file.name.replace(/\.\w+$/, '.jpg'),
+                fileType: 'image/jpeg',
+                originalSize: originalSize,
+                compressedSize: compressedSize,
+                savingsPercent: savingsPercent,
+                dimensions: width + 'x' + height,
+                status: 'pending',
+                uploadedAt: new Date().toISOString(),
+                certifiedBy: currentUser.name || currentUser.phone,
+                country: 'BW',
+                certifiedDate: new Date().toISOString().split('T')[0]
+            };
+            
+            // Sync to Supabase
+            if (typeof saveToSupabase === 'function') {
+                saveToSupabase('seller_documents', currentUser.phone, sellerDocuments[currentUser.phone]);
+            }
             
             
             // Show result
@@ -15761,6 +15938,11 @@ window.approveDocument = function(sellerPhone, docId) {
     
     saveSellerDocuments();
     
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('seller_documents', sellerPhone, sellerDocuments[sellerPhone]);
+    }
+    
     closeCurrentModal();
     alert('✅ Document approved!');
     showAdminDocumentReview();
@@ -15781,6 +15963,11 @@ window.rejectDocument = function(sellerPhone, docId) {
     sellerDocuments[sellerPhone][docId].adminNotes = notes;
     
     saveSellerDocuments();
+    
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('seller_documents', sellerPhone, sellerDocuments[sellerPhone]);
+    }
     
     closeCurrentModal();
     alert('❌ Document rejected. Seller will be notified to re-upload.');
@@ -16127,8 +16314,8 @@ function renderSellerShopScreen() {
         
         for (var i = 0; i < sellerProducts.length; i++) {
             var p = sellerProducts[i];
-            var productImages = typeof getProductImages === 'function' ? getProductImages(p.id) : [];
-            var mainImage = (productImages && productImages.length > 0) ? productImages[0] : '';
+            var pImages = typeof getProductImages === 'function' ? getProductImages(p.id) : [];
+            var mainImage = (pImages && pImages.length > 0) ? pImages[0] : '';
             
             if (!mainImage) continue;
             
@@ -16508,7 +16695,7 @@ async function checkout() {
                 });
                 
                 var freshAcc = freshPosition.coords.accuracy;
-                console.log("📍 Attempt " + gpsAttempts + " - Fresh GPS accuracy:", freshAcc + "m");
+                console.log("?? Attempt " + gpsAttempts + " - Fresh GPS accuracy:", freshAcc + "m");
                 
                 if (freshAcc <= MAX_ACCURACY) {
                     buyerLocation = {
@@ -25678,6 +25865,19 @@ async function saveAllData() {
             await saveToSupabase('couriers', couriers[i].id, couriers[i]);
         }
         await saveToSupabase('finance_data', 'main', financeData);
+        // Director Security Data
+        var securityData = {
+            passphraseHash: localStorage.getItem('bringmine_director_passphrase_hash') || '',
+            a1Hash: localStorage.getItem('bringmine_director_a1_hash') || '',
+            a2Hash: localStorage.getItem('bringmine_director_a2_hash') || '',
+            q1: localStorage.getItem('bringmine_director_q1') || '',
+            q2: localStorage.getItem('bringmine_director_q2') || '',
+            directorPhone: localStorage.getItem('bringmine_director_phone') || '',
+            securityLog: localStorage.getItem('bringmine_security_log') || '[]',
+            resetAttempts: localStorage.getItem('bringmine_reset_attempts') || '[]',
+            emailQueue: localStorage.getItem('bringmine_email_queue') || '[]'
+        };
+        await saveToSupabase('director_security', 'main', securityData);
         for (var phone in sellerDocuments) {
             if (sellerDocuments.hasOwnProperty(phone)) {
                 await saveToSupabase('seller_documents', phone, sellerDocuments[phone]);
@@ -29636,7 +29836,7 @@ const PRODUCT_CATEGORIES = {
 
 // ========== TOOLS & HARDWARE ==========
 'tools': { name: '🔧 Tools', icon: '🔧', color: '#f59e0b', subcategories: ['⚡ power_tools', '🔨 hand_tools', '📌 hardware', '🧰 tool_storage', '🛡️ safety_gear', '📏 measuring_tools', '⚡ electrical_tools', '🔧 plumbing_tools', '🔥 welding', '?? woodworking'] },
-'power_tools': { name: '⚡ Power Tools', icon: '⚡', color: '#3b82f6', parent: 'tools', subcategories: ['🔌 drills', '🪚 saws', '🖌️ sanders', '🔧 grinders', '🔧 routers', '🪚 planers', '🔫 nail_guns', '🔧 impact_wrenches', '🔧 oscillating_tools', '🔋 power_tool_batteries'] },
+'power_tools': { name: '⚡ Power Tools', icon: '⚡', color: '#3b82f6', parent: 'tools', subcategories: ['🔌 drills', '🪚 saws', '??️ sanders', '🔧 grinders', '🔧 routers', '🪚 planers', '🔫 nail_guns', '🔧 impact_wrenches', '🔧 oscillating_tools', '🔋 power_tool_batteries'] },
 'hand_tools': { name: '🔨 Hand Tools', icon: '🔨', color: '#f59e0b', parent: 'tools', subcategories: ['?? hammers', '🪛 screwdrivers', '?? wrenches', '?? pliers', '?? sockets', '🔄 ratchets', '🔧 hex_keys', '🪚 chisels', '📁 files', '?? clamps', '⚙️ vises'] },
 'hardware': { name: '📌 Hardware', icon: '📌', color: '#8b5cf6', parent: 'tools', subcategories: ['🔩 nails', '🔩 screws', '🔩 bolts', '🔩 nuts', '🔩 washers', '📌 anchors', '🔧 brackets', '🚪 hinges', '🚪 handles', '🔒 locks', '🔑 keys'] },
 'tool_storage': { name: '🧰 Tool Storage', icon: '🧰', color: '#10b981', parent: 'tools', subcategories: ['📦 toolboxes', '🎒 tool_bags', '🗄️ tool_chests', '🗄️ tool_cabinets', '📌 pegboards', '📦 tool_organizers', '🔧 socket_sets'] },
@@ -29675,7 +29875,7 @@ const PRODUCT_CATEGORIES = {
 'disaster_recovery': { name: '🔄 Disaster Recovery', icon: '🔄', color: '#ef4444', parent: 'tech_services', subcategories: ['?? backup_services', '🔄 business_continuity', '💾 data_restoration', '☁️ cloud_backup_dr', '📋 dr_planning', '🧪 dr_testing'] },
 
 // ========== VEHICLES FOR SALE (NEW) ==========
-'vehicles_for_sale': { name: '🚗 Vehicles For Sale', icon: '🚗', color: '#3b82f6', subcategories: ['🚘 cars_for_sale', '🏍️ motorcycles_for_sale', '⛵ boats_for_sale', '🚐 rvs_for_sale', '🚛 commercial_vehicles', '🏁 classic_cars', '⚡ electric_vehicles', '🏎️ atvs_utvs', '🏌️ golf_carts', '🚛 trailers'] },
+'vehicles_for_sale': { name: '🚗 Vehicles For Sale', icon: '??', color: '#3b82f6', subcategories: ['🚘 cars_for_sale', '🏍️ motorcycles_for_sale', '⛵ boats_for_sale', '🚐 rvs_for_sale', '🚛 commercial_vehicles', '🏁 classic_cars', '⚡ electric_vehicles', '🏎️ atvs_utvs', '🏌️ golf_carts', '🚛 trailers'] },
 'cars_for_sale': { name: '🚘 Cars For Sale', icon: '🚘', color: '#3b82f6', parent: 'vehicles_for_sale', subcategories: ['🆕 new_cars', '🔧 used_cars', '✅ certified_pre_owned', '💎 luxury_cars', '🏎️ sports_cars', '🚗 sedans', '🚙 suvs', '🛻 trucks', '🚗 hatchbacks', '🚐 vans', '⚡ hybrid_cars', '🔋 electric_cars'] },
 'classic_cars': { name: '🏁 Classic Cars', icon: '🏁', color: '#ec4899', parent: 'vehicles_for_sale', subcategories: ['📻 vintage_cars', '??️ antique_cars', '💪 muscle_cars', '🔧 restored_cars', '🔨 project_cars', '🏆 collector_cars'] },
 'motorcycles_for_sale': { name: '🏍️ Motorcycles For Sale', icon: '🏍️', color: '#f59e0b', parent: 'vehicles_for_sale', subcategories: ['🏁 sport_bikes', '🛣️ cruisers', '🛣️ touring', '🏔️ dirt_bikes', '🔄 dual_sport', '🛵 scooters', '🏍️ mopeds', '⚡ electric_motorcycles'] },
@@ -29848,7 +30048,7 @@ const PRODUCT_CATEGORIES = {
 'moving_services': { name: '🚚 Moving Services', icon: '🚚', color: '#f59e0b', parent: 'services', subcategories: ['🏠 local_moving', '🛣️ long_distance_moving', '🏢 commercial_moving', '📦 packing_services', '?? storage_services', '🎹 piano_moving', '🚗 vehicle_shipping', '🚛 freight_services'] },
 'education_services': { name: '📚 Education Services', icon: '📚', color: '#10b981', parent: 'services', subcategories: ['📖 tutoring', '📝 test_prep', '🗣️ language_lessons', '🎵 music_lessons', '🎨 art_classes', '💃 dance_classes', '💪 fitness_classes', '💻 online_courses', '🛠️ workshops', '🎯 career_coaching'] },
 'consulting': { name: '💼 Consulting Services', icon: '??', color: '#3b82f6', parent: 'services', subcategories: ['🏢 business_consulting', '📊 management_consulting', '📈 marketing_consulting', '👥 hr_consulting', '🎯 career_consulting', '🌟 life_coaching', '❤️ relationship_coaching', '🏠 real_estate_consulting'] },
-'transportation_services': { name: '?? Transportation Services', icon: '🚕', color: '#8b5cf6', parent: 'services', subcategories: ['✈️ airport_transfers', '🚗 private_car_service', '🚐 limousine_service', '🚐 shuttle_service', '📦 delivery_service', '📬 courier_service', '🚗 rideshare', '🚌 school_bus_services', '🚑 medical_transportation'] },
+'transportation_services': { name: '?? Transportation Services', icon: '🚕', color: '#8b5cf6', parent: 'services', subcategories: ['✈️ airport_transfers', '🚗 private_car_service', '🚐 limousine_service', '🚐 shuttle_service', '📦 delivery_service', '?? courier_service', '🚗 rideshare', '🚌 school_bus_services', '🚑 medical_transportation'] },
 'security_services': { name: '🛡️ Security Services', icon: '🛡️', color: '#ef4444', parent: 'services', subcategories: ['👮 security_guards', '🎪 event_security', '📹 surveillance_installation', '?? alarm_monitoring', '💪 bodyguard_services', '💻 cybersecurity_services', '🕵️ private_investigation'] },
 
 
@@ -29922,7 +30122,7 @@ const PRODUCT_CATEGORIES = {
 'package_delivery': { name: '📦 Package Delivery', icon: '📦', color: '#3b82f6', parent: 'delivery_logistics', subcategories: ['🏠 local_package_delivery', '🇺🇸 national_package_delivery', '🌍 international_package_delivery', '⚡ express_package_delivery', '🚛 freight_package'] },
 'same_day_delivery': { name: '⚡ Same Day Delivery', icon: '⚡', color: '#f59e0b', parent: 'delivery_logistics', subcategories: ['🏠 local_same_day', '🕐 on_demand_delivery', '🛵 courier_same_day', '🛍️ retail_same_day', '📄 document_same_day'] },
 'freight_shipping': { name: '🚛 Freight Shipping', icon: '??', color: '#8b5cf6', parent: 'delivery_logistics', subcategories: ['📦 ltl_freight', '🚛 full_truckload', '🚂 intermodal_freight', '⚡ expedited_freight', '⚠️ hazmat_freight', '📏 oversized_freight'] },
-'last_mile_delivery': { name: '🏁 Last Mile Delivery', icon: '🏁', color: '#10b981', parent: 'delivery_logistics', subcategories: ['🏠 residential_last_mile', '🏢 commercial_last_mile', '🧤 white_glove_delivery', '🔧 assembly_delivery', '🔌 appliance_delivery'] },
+'last_mile_delivery': { name: '🏁 Last Mile Delivery', icon: '🏁', color: '#10b981', parent: 'delivery_logistics', subcategories: ['🏠 residential_last_mile', '🏢 commercial_last_mile', '?? white_glove_delivery', '🔧 assembly_delivery', '🔌 appliance_delivery'] },
 'warehousing': { name: '🏭 Warehousing', icon: '🏭', color: '#64748b', parent: 'delivery_logistics', subcategories: ['📦 storage_warehousing', '📦 fulfillment_warehousing', '??️ climate_controlled_warehouse', '🔒 bonded_warehouse', '🔄 cross_docking'] },
 'courier_services_expanded': { name: '🛵 Courier Services', icon: '🛵', color: '#f59e0b', parent: 'delivery_logistics', subcategories: ['🏍️ motorcycle_courier', '🚲 bicycle_courier', '🚗 car_courier', '🏥 medical_courier', '⚖️ legal_courier', '📄 document_courier'] },
 
@@ -30436,6 +30636,12 @@ function submitProductReview(productId, orderId) {
         window.pendingReviews = [];
     }
     pendingReviews.push(newReview);
+    
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('reviews', newReview.id, newReview);
+    }
+    
     saveAllData();
     
     // Notify admin
@@ -30548,26 +30754,37 @@ window.markReviewHelpful = function(reviewId) {
 
 // Get product reviews
 window.getProductReviews = function(productId) {
-    return reviews.filter(r => r.productId === productId).sort((a, b) => 
-        new Date(b.timestamp) - new Date(a.timestamp)
-    );
+    var result = [];
+    for (var i = 0; i < reviews.length; i++) {
+        if (reviews[i].productId === productId) {
+            result.push(reviews[i]);
+        }
+    }
+    result.sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+    return result;
 };
 
 // Get average rating for product
 window.getProductRating = function(productId) {
-    const productReviews = reviews.filter(r => r.productId === productId);
-    if (productReviews.length === 0) return null;
-    const avg = productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length;
-    return {
-        average: Math.round(avg * 10) / 10,
-        count: productReviews.length,
-        distribution: {
-            5: productReviews.filter(r => r.rating === 5).length,
-            4: productReviews.filter(r => r.rating === 4).length,
-            3: productReviews.filter(r => r.rating === 3).length,
-            2: productReviews.filter(r => r.rating === 2).length,
-            1: productReviews.filter(r => r.rating === 1).length
+    var productReviews = [];
+    for (var i = 0; i < reviews.length; i++) {
+        if (reviews[i].productId === productId) {
+            productReviews.push(reviews[i]);
         }
+    }
+    if (productReviews.length === 0) return null;
+    
+    var sum = 0;
+    var dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    for (var i = 0; i < productReviews.length; i++) {
+        sum += productReviews[i].rating;
+        dist[productReviews[i].rating] = (dist[productReviews[i].rating] || 0) + 1;
+    }
+    
+    return {
+        average: Math.round((sum / productReviews.length) * 10) / 10,
+        count: productReviews.length,
+        distribution: dist
     };
 };
 function showShippingDetails() {
@@ -34545,9 +34762,16 @@ function deleteReview(reviewId) {
 
 // Mark review as helpful
 function markReviewHelpful(reviewId) {
-    const review = reviews.find(r => r.id === reviewId);
+    var review = null;
+    for (var i = 0; i < reviews.length; i++) {
+        if (reviews[i].id === reviewId) { review = reviews[i]; break; }
+    }
     if (review) {
         review.helpful = (review.helpful || 0) + 1;
+        // Sync to Supabase
+        if (typeof saveToSupabase === 'function') {
+            saveToSupabase('reviews', reviewId, review);
+        }
         saveAllData();
         alert('👍 Thanks for your feedback!');
         
@@ -38687,7 +38911,22 @@ async function loadAllData() {
         
         var fd = await loadFromSupabase('finance_data');
         financeData = (fd && fd.length > 0 && fd[0].data) ? fd[0].data : { income: { serviceFees: [] }, expenses: [] };
-        
+       
+      var sec = await loadFromSupabase('director_security');
+        if (sec && sec.length > 0 && sec[0].data) {
+            var securityData = sec[0].data;
+            if (securityData.passphraseHash) localStorage.setItem('bringmine_director_passphrase_hash', securityData.passphraseHash);
+            if (securityData.a1Hash) localStorage.setItem('bringmine_director_a1_hash', securityData.a1Hash);
+            if (securityData.a2Hash) localStorage.setItem('bringmine_director_a2_hash', securityData.a2Hash);
+            if (securityData.q1) localStorage.setItem('bringmine_director_q1', securityData.q1);
+            if (securityData.q2) localStorage.setItem('bringmine_director_q2', securityData.q2);
+            if (securityData.directorPhone) localStorage.setItem('bringmine_director_phone', securityData.directorPhone);
+            if (securityData.securityLog) localStorage.setItem('bringmine_security_log', securityData.securityLog);
+            if (securityData.resetAttempts) localStorage.setItem('bringmine_reset_attempts', securityData.resetAttempts);
+            if (securityData.emailQueue) localStorage.setItem('bringmine_email_queue', securityData.emailQueue);
+            console.log('✅ Director security loaded from Supabase');
+        }
+      
         var sd = await loadFromSupabase('seller_documents');
         sellerDocuments = {};
         if (sd) for (var i = 0; i < sd.length; i++) { if (sd[i].data) sellerDocuments[sd[i].id] = sd[i].data; }
@@ -42565,7 +42804,7 @@ function renderActiveOrdersForSeller(orders) {
                 if (order.proofOfPayment) {
                     html += '<div style="background:#d1fae5;border-radius:8px;padding:10px;margin-top:8px;">' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-                        '<span class="text-small" style="color:#059669;">📸 Payment Proof Submitted</span>' +
+                        '<span class="text-small" style="color:#059669;">?? Payment Proof Submitted</span>' +
                         '<button onclick="viewOrderProof(\'' + order.id + '\')" style="padding:6px 14px;background:#10b981;color:white;border:none;border-radius:15px;font-size:11px;cursor:pointer;">👁️ View Proof</button>' +
                         '</div>' +
                         '</div>';
@@ -45496,7 +45735,7 @@ function renderShippedOrdersForSeller(orders) {
             '</div>' +
             '<div style="flex: 1;">' +
             '<strong>📦 Items:</strong> ' + totalItems + '<br>' +
-            '<strong>💰 Total:</strong> ' + formatBWP(order.total) +
+            '<strong>?? Total:</strong> ' + formatBWP(order.total) +
             '</div>' +
             '</div>' +
             
@@ -50725,7 +50964,7 @@ function renderDirectorDashboard() {
     html += '<div style="font-size:11px;color:#6b7280;">Orders</div></div>';
     
     html += '<div style="background:white;border-radius:16px;padding:16px;text-align:center;border:2px solid #fbcfe8;">';
-    html += '<div style="font-size:32px;">??</div>';
+    html += '<div style="font-size:32px;">💰 </div>';
     html += '<div style="font-size:24px;font-weight:700;color:#10b981;">' + formatBWP(totalRevenue) + '</div>';
     html += '<div style="font-size:11px;color:#6b7280;">Revenue</div></div>';
     html += '</div>';
@@ -56264,7 +56503,7 @@ window.executeUpdateNationalId = function() {
             message += '2. Use Account Recovery to access your original account\n\n';
         }
         
-        message += 'Contact support: support@sadcmall.co.bw';
+        message += 'Contact support: support@bringmine.shop';
         
         alert(message);
         return;
@@ -56586,7 +56825,7 @@ window.verifyIdForRecovery = function() {
                       'This National ID belongs to an account that was previously deleted.\n\n' +
                       'Deleted accounts cannot be recovered.\n\n' +
                       'If you believe this is an error, contact support:\n' +
-                      '📧 support@sadcmall.co.bw');
+                      '📧 support@bringmine.shop');
                 return;
             }
         }
@@ -56702,7 +56941,7 @@ function showSecurityQuestionStep(foundUser, newPhone) {
               'This account did not set up a security question during registration.\n\n' +
               'Without a security question, we cannot verify your identity.\n\n' +
               'Please contact support for manual verification:\n' +
-              '📧 support@sadcmall.co.bw\n📞 +267 77 000 000');
+              '📧 support@bringmine.shop\n📞 +267 77 000 000');
         
         // Clear recovery data
         window._recoveryData = null;
@@ -56886,7 +57125,7 @@ window.verifySecurityAnswer = function() {
                   'You have exceeded the maximum number of attempts.\n\n' +
                   'For your security, account recovery has been blocked for this session.\n\n' +
                   'Please try again later or contact support:\n' +
-                  '📧 support@sadcmall.co.bw');
+                  '📧 support@bringmine.shop');
         } else {
             alert('❌ Incorrect Answer\n\n' +
                   remainingAttempts + ' attempt(s) remaining.\n\n' +
@@ -70332,6 +70571,14 @@ window.submitProductEdit = function(productId) {
     product.approved = false;
     product.pendingApproval = true;
     
+   // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('products', productId, product);
+        if (window.editProductImages && window.editProductImages.length > 0) {
+            saveToSupabase('product_images', productId, window.editProductImages);
+        }
+    }
+    
     if (typeof saveAllData === 'function') saveAllData();
     
     closeModal('edit_product_modal');
@@ -70469,9 +70716,15 @@ window.deleteProduct = function(productId) {
     }
     
     // Remove images
-    var productImages = productImages || {};
-    delete productImages[productId];
+    if (typeof productImages !== 'undefined' && productImages[productId]) {
+        delete productImages[productId];
+    }
     
+    // Sync deletion to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('products', productId, { deleted: true, deletedAt: new Date().toISOString() });
+        saveToSupabase('product_images', productId, { deleted: true });
+    }
     
     // Clean cart
     if (typeof cart !== 'undefined' && cart) {
@@ -70481,8 +70734,17 @@ window.deleteProduct = function(productId) {
                 newCart.push(cart[i]);
             }
         }
-        cart = newCart;
+        window.cart = newCart;
+        if (typeof saveUserCart === 'function') saveUserCart(newCart);
     }
+    
+    // Sync deletion to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('products', productId, { deleted: true, deletedAt: new Date().toISOString() });
+        saveToSupabase('product_images', productId, { deleted: true });
+    }
+    
+    
     
     if (typeof saveAllData === 'function') saveAllData();
     if (typeof updateCartCount === 'function') updateCartCount();
@@ -71998,8 +72260,9 @@ window.deleteSellerProduct = function(productId) {
     if (idx !== -1) products.splice(idx, 1);
 
     // Remove images
-    var productImages = productImages || {};
-    delete productImages[productId];
+     if (typeof productImages !== 'undefined' && productImages[productId]) {
+        delete productImages[productId];
+    }
     
 
     // Remove from cart (if any buyer had it in cart)
@@ -72926,16 +73189,18 @@ window.submitProductReview = function(productId, orderId) {
     pendingReviews.push(newReview);
     
     // Save data
+    if (typeof saveToStorage === 'function') {
+        saveToStorage('bringmine_pending_reviews', pendingReviews);
+    }
+    
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('reviews', newReview.id, newReview);
+    }
+    
     if (typeof saveAllData === 'function') {
         saveAllData();
-pendingReviews.push(newReview);
-console.log('✅ Review saved. Total pending:', pendingReviews.length);
-
-// Force save immediately
-if (typeof saveToStorage === 'function') {
-    saveToStorage('bringmine_pending_reviews', pendingReviews);
-    console.log('💾 Force saved pendingReviews to localStorage');
-}
+    }
     
     // Notify admin
     if (typeof addNotification === 'function') {
@@ -72964,38 +73229,83 @@ if (typeof saveToStorage === 'function') {
     }
 };
 function submitReviewWithImage(productId, orderId) {
-   
- const rating = selectedRatingValue;
-    const comment = document.getElementById('reviewText')?.value;
+    var rating = window.selectedRatingValue || 0;
+    var comment = document.getElementById('reviewText') ? document.getElementById('reviewText').value : '';
     
-    if (rating === 0) {
+    if (!rating || rating === 0) {
         alert('Please select a rating');
         return;
     }
     
-    const user = getUserContact(currentUser.phone);
-    const newReview = {
-        id: 'REV' + Date.now().toString().slice(-6),
+    // Find product
+    var product = null;
+    for (var i = 0; i < products.length; i++) {
+        if (products[i].id === productId) { product = products[i]; break; }
+    }
+    
+    var user = typeof getUserContact === 'function' ? getUserContact(currentUser.phone) : null;
+    var userName = user ? (user.name || currentUser.phone) : (currentUser.name || currentUser.phone);
+    
+    var newReview = {
+        id: 'REV' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 3),
         productId: productId,
         orderId: orderId || null,
         buyerPhone: currentUser.phone,
-        buyerName: user.name || currentUser.phone.split('@')[0],
+        buyerName: userName,
+        userName: userName,
         rating: rating,
         comment: comment || '',
-        images: reviewImagesArray,
+        images: window.reviewImagesArray || [],
         date: new Date().toISOString().split('T')[0],
         timestamp: new Date().toISOString(),
         helpful: 0,
-        verified: true
+        verified: true,
+        status: 'pending',
+        submittedAt: new Date().toISOString()
     };
     
+    // Add to reviews array
+    if (typeof reviews === 'undefined') { window.reviews = []; }
     reviews.push(newReview);
-    saveAllData();
-    updateProductRating(productId);
     
-    alert('✅ Review submitted successfully!');
-    closeCurrentModal();
-    showScreen('orders');
+    // Also add to pending reviews
+    if (typeof pendingReviews === 'undefined') { window.pendingReviews = []; }
+    pendingReviews.push(newReview);
+    
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('reviews', newReview.id, newReview);
+    }
+    
+    // Save locally
+    if (typeof saveAllData === 'function') saveAllData();
+    if (typeof saveToStorage === 'function') {
+        saveToStorage('bringmine_reviews', reviews);
+        saveToStorage('bringmine_pending_reviews', pendingReviews);
+    }
+    
+    // Update product rating
+    if (typeof updateProductRating === 'function') updateProductRating(productId);
+    
+    // Notify admin
+    if (typeof addNotification === 'function') {
+        var adminPhone = window.ADMIN_PHONE || '+267 72933326';
+        var commentPreview = comment ? comment.substring(0, 50) : 'No comment';
+        if (comment && comment.length > 50) commentPreview += '...';
+        addNotification(adminPhone, '📝 New Review Pending', 
+            'A new review for "' + (product ? product.name : 'product') + '" needs approval.\n\nRating: ' + rating + ' stars\nComment: ' + commentPreview);
+    }
+    
+    // Reset globals
+    window.selectedRatingValue = 0;
+    window.reviewImagesArray = [];
+    
+    // Close modal and refresh
+    if (typeof closeCurrentModal === 'function') closeCurrentModal();
+    
+    alert('✅ Thank you for your review!\n\nYour review has been submitted and will appear after admin approval.');
+    
+    if (typeof renderScreen === 'function') renderScreen('orders');
 }
 // ==============================================
 // SOCIAL MEDIA SHARING
@@ -73768,6 +74078,12 @@ window.submitReview = function(productId, orderId) {
     
     // Add to pending reviews (not directly to reviews array)
     pendingReviews.push(newReview);
+    
+    // Sync to Supabase
+    if (typeof saveToSupabase === 'function') {
+        saveToSupabase('reviews', newReview.id, newReview);
+    }
+    
     saveAllData();
     
     // Notify admin about new review pending approval
