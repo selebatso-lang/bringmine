@@ -41,8 +41,8 @@
 <meta name="google-site-verification" content="kCe6iHfggR-5z4m3dQhfJ4Kj-aRcubeUy7cnMBjjiJE">
 
 <!-- SEO Meta Tags -->
-<meta name="description" content="Use OrangeMoney, MyZaka, Smega, Mobile Money- Your Neighborhood Marketplace. Buy and sell products, book hotels, find jobs, hire couriers. Everything near you.">
-<meta name="keywords" content="marketplace, Botswana, shop, products, hotels, jobs, courier, buy, sell, Bringmine, Selebi, Phikwe, Gaborone, Francistown">
+<meta name="description" content="BRINGMINE.SHOP — Your Neighborhood Marketplace. Buy & sell products, book hotels, find jobs, hire couriers. Pay with Orange Money, MyZaka, Smega, Mobile Money, bank transfer, or crypto. Available across Botswana and worldwide.">
+<meta name="keywords" content="marketplace, Botswana, shop online, products, hotels, jobs, courier, buy, sell, Gaborone, Francistown, Africa, Orange Money, MyZaka, mobile money, crypto, online shopping, ecommerce">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.bringmine.shop/">
 
@@ -1765,7 +1765,56 @@ window.addEventListener('load', function() {
         finishSplashScreen();
     }, 8000);
 });
+// ===== SOURCE CODE PROTECTION =====
+// Disable right-click
+// Disable right-click
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
+// Block F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); return false; }
+});
+
+// Prevent loading in iframes
+if (window.top !== window.self) {
+    window.top.location = window.self.location;
+}
+// DevTools detection (safe - no debugger)
+var _devToolsOpen = false;
+setInterval(function() {
+    var widthDiff = window.outerWidth - window.innerWidth > 200;
+    var heightDiff = window.outerHeight - window.innerHeight > 200;
+    if ((widthDiff || heightDiff) && !_devToolsOpen) {
+        _devToolsOpen = true;
+        document.body.innerHTML = '<div style="text-align:center;padding:100px;font-family:sans-serif;background:white;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;">' +
+            '<h1>⚠️ Developer Tools Detected</h1>' +
+            '<p style="color:#6b7280;">Please close DevTools to use BRINGMINE.SHOP</p>' +
+            '<p style="color:#9ca3af;font-size:12px;">Refresh the page after closing.</p>' +
+            '</div>';
+    }
+    if (!widthDiff && !heightDiff) {
+        _devToolsOpen = false;
+    }
+}, 1500);
+// ===== PRODUCTION SECURITY =====
+if (window.location.hostname !== 'localhost') {
+    // Block Eruda
+    if (typeof eruda !== 'undefined') { eruda.destroy(); }
+    
+    // Clear console
+    setInterval(function() { console.clear(); }, 3000);
+    
+    // Disable text selection
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+}
+
+// Basic bot detection
+if (/bot|crawler|spider|crawling/i.test(navigator.userAgent)) {
+    document.body.innerHTML = '<h1 style="text-align:center;padding:100px;">Access Denied</h1>';
+}
 var loginStep = 'role';
 var APP_STATE = { currentScreen: 'login' };
 let comparisonList = [];
@@ -5332,7 +5381,7 @@ function handleDeletedAccountLogin(phone) {
             'Contact our support team with your 9 Secret Numbers:<br>' +
             '<strong>ID:</strong> ' + (maskedId || 'Not on file') + '<br><br>' +
             '📧 Email: <strong>support@bringmine.co.bw</strong><br>' +
-            '📞 Phone: <strong>+267 71 234568</strong><br>' +
+            '?? Phone: <strong>+267 71 234568</strong><br>' +
             '💬 Use the Support tab in the app<br><br>' +
             'Your data is safely stored and can be fully recovered.' +
             '</p>' +
@@ -14016,7 +14065,7 @@ var product = window._bookingProduct;
     }
     if (!confirm('Confirm booking?\n\n' +
         '📦 ' + product.name + '\n' +
-        (rooms > 1 ? (booking.type === 'time_slots' ? '👥 ' : booking.type === 'single_date' ? '🎫 ' : '🏨 ') + rooms + ' ' + quantityLabel + '\n' : '') +
+        (rooms > 1 ? (booking.type === 'time_slots' ? '👥 ' : booking.type === 'single_date' ? '?? ' : '🏨 ') + rooms + ' ' + quantityLabel + '\n' : '') +
         '📅 ' + (checkIn || '') + (checkOut ? ' → ' + checkOut : '') + '\n' +
         (timeSlot ? '⏰ ' + timeSlot + '\n' : '') +
         '👤 ' + (guests || 1) + ' guest' + ((guests || 1) > 1 ? 's' : '') + '\n' +
@@ -62055,44 +62104,52 @@ window.runFullProofCleanup = function() {
     alert('🗑️ Full Cleanup Complete!\n\n📋 Job proofs cleared: ' + jobCleaned + '\n🚀 Promo proofs cleared: ' + promoCleaned + '\n\n💰 Total space reclaimed: ~' + (totalCleaned * 300) + 'KB');
 };
 function renderPendingPromotionsSection() {
-       if (typeof promotionRequests === 'undefined') {
+    if (typeof promotionRequests === 'undefined') {
         window.promotionRequests = [];
         return '';
     }
     if (!promotionRequests || promotionRequests.length === 0) {
         return '';
     }
-var pending = promotionRequests.filter(function(r) { return r.status === 'pending'; });
+    
+    var pending = promotionRequests.filter(function(r) { return r.status === 'pending'; });
     if (pending.length === 0) return '';
     
     var html = '<div class="admin-panel" style="background:white;border-radius:20px;padding:18px;margin-bottom:16px;border:2px solid #fbcfe8;">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
-        '<h4 style="margin:0;font-size:15px;"> Promotion Requests (' + promotionRequests.length + ')</h4>' +
+        '<h4 style="margin:0;font-size:15px;">🌟 Promotion Requests (' + pending.length + ')</h4>' +
         '<button onclick="viewPromotionRequests()" class="pink-btn-outline" style="padding:6px 14px;font-size:11px;">View All</button>' +
         '</div>';
     
-    var maxShow = Math.min(promotionRequests.length, 3);
+    var maxShow = Math.min(pending.length, 3);
     for (var i = 0; i < maxShow; i++) {
-        var req = promotionRequests[i];
+        var req = pending[i];
         
         html += '<div style="background:#fef3c7;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #fde68a;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;">' +
             '<div>' +
-            '<strong style="font-size:13px;">' + (req.packageIcon || '') + ' ' + escapeHtml(req.packageName) + '</strong>' +
+            '<strong style="font-size:13px;">' + (req.packageIcon || '🌟') + ' ' + escapeHtml(req.packageName) + '</strong>' +
             '<span style="font-size:11px;color:#92400e;margin-left:8px;">P' + (req.price || 0) + '</span>' +
             '</div>' +
             '<span style="font-size:10px;background:#f59e0b;color:white;padding:2px 8px;border-radius:10px;">Pending</span>' +
             '</div>' +
-            '<div style="font-size:11px;color:#6b7280;"> ' + escapeHtml(req.productName) + ' |  ' + escapeHtml(req.sellerPhone || req.sellerId) + '</div>' +
+            '<div style="font-size:11px;color:#6b7280;">📦 ' + escapeHtml(req.productName) + ' | 👤 ' + escapeHtml(req.sellerPhone || req.sellerId) + '</div>' +
+            (req.proofOfPayment ? 
+                '<div style="margin-top:6px;">' +
+                '<img src="' + (req.proofOfPayment.data || req.proofOfPayment) + '" style="max-width:100%;max-height:120px;border-radius:8px;cursor:pointer;border:2px solid #10b981;" onclick="viewFullProofImage(this.src)">' +
+                '<div style="font-size:9px;color:#10b981;margin-top:2px;">✅ Proof uploaded</div>' +
+                '</div>' : 
+                '<div style="font-size:9px;color:#ef4444;margin-top:4px;">⚠️ No proof of payment</div>'
+            ) +
             '<div style="display:flex;gap:6px;margin-top:8px;">' +
-            '<button onclick="approvePromotion(\'' + req.id + '\')" style="flex:1;padding:6px;background:#10b981;color:white;border:none;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;"> Approve</button>' +
-            '<button onclick="rejectPromotion(\'' + req.id + '\')" style="flex:1;padding:6px;background:#fee2e2;color:#ef4444;border:1px solid #fecaca;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;"> Reject</button>' +
+            '<button onclick="approvePromotion(\'' + req.id + '\')" style="flex:1;padding:6px;background:#10b981;color:white;border:none;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;">✅ Approve</button>' +
+            '<button onclick="rejectPromotion(\'' + req.id + '\')" style="flex:1;padding:6px;background:#fee2e2;color:#ef4444;border:1px solid #fecaca;border-radius:15px;cursor:pointer;font-size:11px;font-weight:600;">❌ Reject</button>' +
             '</div>' +
             '</div>';
     }
     
-    if (promotionRequests.length > 3) {
-        html += '<div style="text-align:center;font-size:11px;color:#6b7280;">+ ' + (promotionRequests.length - 3) + ' more requests</div>';
+    if (pending.length > 3) {
+        html += '<div style="text-align:center;font-size:11px;color:#6b7280;">+ ' + (pending.length - 3) + ' more requests</div>';
     }
     
     html += '</div>';
