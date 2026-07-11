@@ -51,7 +51,9 @@
 <meta property="og:description" content="Buy and sell products, book hotels, find jobs, hire couriers. Everything near you in Botswana.">
 <meta property="og:url" content="https://www.bringmine.shop/">
 <meta property="og:type" content="website">
-
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
@@ -6408,7 +6410,7 @@ function renderCourierSectionForSeller(orderId, sellerLat, sellerLng) {
     }
     
     var html = '<div style="margin-top: 16px;">' +
-        '<h4>🚚 Available Couriers Near You (5km)</h4>' +
+        '<h4>?? Available Couriers Near You (5km)</h4>' +
         '<p class="text-small">Choose a courier to deliver this order</p>';
     
     for (var i = 0; i < couriers.length; i++) {
@@ -23423,8 +23425,9 @@ function renderAddProductFormWithCategories() {
         
         // Product Name
         '<input type="text" id="productName" class="seller-input" placeholder="Product Name *" required style="margin-bottom: 12px;">' +
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;margin-bottom:8px;">💡 Be specific — "Samsung Galaxy S25 Ultra 256GB Black" sells better than just "Phone"</div>' +
         '<textarea id="productDescription" class="seller-input" rows="3" placeholder="Product Description (e.g., fresh, organic, locally grown...)" style="margin-bottom: 12px;"></textarea>' +
-        
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;margin-bottom:8px;">💡 Mention condition (new/used if you do not then buyers will reject your product at delivery and you wont be paid for shipping costs), brand, material, size, color, or features. For clothing: include fabric and fit.</div>' +
         // Category
         '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">' +
         '<select id="mainCategory" class="seller-input" required onchange="updateSubcategories(); checkServiceCategory()">' +
@@ -23448,10 +23451,11 @@ function renderAddProductFormWithCategories() {
         '<input type="number" id="minOrder" class="seller-input" placeholder="Min Order *" value="1" step="0.1" required>' +
         '<input type="number" id="maxOrder" class="seller-input" placeholder="Max Order *" value="10" step="0.1" required>' +
         '</div>' +
-        
+        '<div class="text-small" style="color:#6b7280;margin-bottom:8px;">💡 <strong>Min:</strong> You Can Deliver From How Many . <strong>Max:</strong> Limit per buyer (e.g., 5 for wholesale).</div>' +
         // Stock (hidden for services)
         '<div id="stockField">' +
         '<input type="number" id="stock" class="seller-input" placeholder="Stock Quantity *" required step="0.1" style="margin-bottom: 12px;">' +
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;">💡 How many you have. Updates automatically when orders come in.</div>' +
         '</div>' +
         
         // ===== SERVICE SETTINGS SECTION =====
@@ -23670,7 +23674,7 @@ function renderAddProductFormWithCategories() {
         '</div>' +
         '<div id="discountPreview" class="text-small" style="color: #6b7280; margin-top: 4px;"></div>' +
         '</div>' +
-        
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;">💡 <strong>15% off</strong> = P200 becomes P170. Discounted items appear in ⚡ Flash Sales on the home screen!</div>' +
         // Bulk Discount
         '<div style="margin: 12px 0; padding: 12px; background: #f9fafb; border-radius: 12px;">' +
         '<label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 12px;">' +
@@ -23689,7 +23693,7 @@ function renderAddProductFormWithCategories() {
         '<button type="button" class="text-small" onclick="addBulkTier()" style="margin-top: 8px; background: #f3f4f6; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer;">+ Add Another Tier</button>' +
         '</div>' +
         '</div>' +
-        
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;">💡 Buy 2+ = 5% off, Buy 5+ = 15% off. Great for clearing stock or wholesalers!</div>' +
         
         
         // Price Preview
@@ -23714,7 +23718,7 @@ function renderAddProductFormWithCategories() {
         '<div id="imagePreviewContainer" style="margin-top: 8px;"></div>' +
         '<div class="text-small" style="color: #ef4444; margin-top: 4px;">⚠️ Product will NOT be visible to buyers until you upload at least one image</div>' +
         '</div>' +
-        
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;">💡 <strong>First image</strong> is your cover photo — use clear lighting! Good photos sell 3x more.</div>' +
         (typeof renderVariantsSection === 'function' ? renderVariantsSection() : '') +
         // ===== SHIPPING SETTINGS (inside add product form) =====
         '<div style="background:#e0f2fe;border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid #bae6fd;">' +
@@ -23732,6 +23736,7 @@ function renderAddProductFormWithCategories() {
         '<div><label style="font-size:10px;">Per Km Rate (P)</label>' +
         '<input type="number" id="productPerKmRate" class="seller-input" value="1" min="0" step="0.01"></div>' +
         '</div>' +
+        '<div class="text-small" style="color:#6b7280;margin-top:4px;">💡 Nearby buyers pay nothing. Example: P30 base + P1/km = 10km delivery = P37.</div>' +
         '</div>' +
         '</div>' +
         '<button type="button" class="pink-btn" id="submitProductBtn" onclick="submitProductWithLoading()" style="width: 100%; margin-top: 16px;">👍 Submit Product for Approval</button>' +
@@ -25821,8 +25826,8 @@ if (bookingType === 'date_range') {
         createdAt: now,
         updatedAt: now,
         distance: null,
-        offersFreeShipping: false,
-        freeShippingKm: 0
+        offersFreeShipping: offersFreeShipping,
+        freeShippingKm: freeShippingKm
     };
     
     // Check if free shipping was enabled in form
@@ -25844,13 +25849,12 @@ if (bookingType === 'date_range') {
 // Save images to Supabase FIRST
 // Store images INSIDE the product data
 // Create thumbnails for listing screens
-var thumbnails = [];
-for (var ti = 0; ti < tempProductImages.length; ti++) {
-    var thumb = await createThumbnail(tempProductImages[ti]);
-    thumbnails.push(thumb);
-}
-productImages[newProduct.id] = [...tempProductImages]; // Full in memory
-newProduct._images = thumbnails; // Thumbnails in product for fast loading
+// Create ONLY ONE thumbnail for listing screens (first image only)
+var firstThumb = await createThumbnail(tempProductImages[0]);
+newProduct._images = [firstThumb]; // Only 1 thumbnail (~4KB) in product
+
+// Keep all full images separate
+productImages[newProduct.id] = [...tempProductImages]; // Full images in memory
 
 // Save directly to Supabase (bypass failing saveAllData)
 if (typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -30582,7 +30586,7 @@ const PRODUCT_CATEGORIES = {
 'birds': { name: '🐔 Birds', icon: '🐔', color: '#ef4444', isAlive: true, subcategories: ['🐓 farm_chicken', '🐔 broiler', '🐓 layer', '🐣 broilerchick', '🐣 layerchick', '🦢 geese', '🪿 duck', '🐦 birdkinds'] },
 'dairy': { name: '🥛 Dairy', icon: '🥛', color: '#f3f4f6', isFresh: true, subcategories: ['🥛 milk', '🧀 cheese', '🥣 yogurt', '🧈 butter', '🥛 cream', '🥚 eggs', '🌱 plant_based_dairy'] },
 'grains': { name: '🌾 Grains', icon: '🌾', color: '#f59e0b', isFresh: true, subcategories: ['🍚 rice', '🌾 wheat', '🌾 oats', '🌾 quinoa', '🌾 barley', '🌽 corn', '🌾 millet', '🌾 buckwheat', '🏛️ ancient_grains', '🌾 sorghum', '🌽 maize', '🌾 rye', '🌾 spelt', '🌾 teff', '🌾 amaranth', '🌾 farro', '🌾 freekeh', '🌾 wild_rice', '🌾 triticale', '🌾 fonio', '🌾 khorasan_wheat', '🌾 emmer', '🌾 einkorn', '🌾 jobs_tears', '🌾 canary_seed'] },
-'groceries': { name: '🏪 Groceries', icon: '🏪', color: '#8b5cf6', isFresh: false, subcategories: ['🥫 canned_goods', '🍝 pasta_types', '🥫 sauces_types', '🍯 oils_typed', '🌶️ spices_dried_herbs', '🍰 baking_supplies', '🍿 snacks_chips', '🍪 bread_types', '🍬 candy_types', '🥜 grain_types', '🥜 butters', '🍯 jams_honey', '🥣 grocery_combos', '🥣 broths_stocks', '☕ coffee_tea', '🧃 juices_drinks', '💧 water_soda', '🥣 breakfast_cereals', '🍫 granola_bars', '🍰 rice_cakes', '🌾 flour_meal', '🍬 sugar_sweeteners', '🧂 salt_pepper', '🍞 breadcrumbs', '🥖 croutons', '🥒 pickles_olives', '🫑 salsa_dips', '🍅 mustard_ketchup', '🥗 mayo_dressing', '🍶 soy_sauce', '🌶️ hot_sauce', '🍶 worcestershire', '🍖 barbecue_sauce', '🍶 teriyaki_glaze', '🌿 pesto', '🫘 hummus', '🥜 tahini', '🍶 vinegars', '🫒 cooking_oils', '💨 cooking_sprays', '🎨 food_coloring', '✨ sprinkles', '🍫 baking_chips', '🍫 cocoa_powder', '🍰 cake_mixes', '🍰 frosting', '🥧 pie_fillings', '🍇 dried_fruits', '🌿 dried_seaweed', '🍜 instant_noodles', '🍜 ramen', '🌾 couscous', '🌽 polenta', '🌮 tortillas', '🫓 flatbread', '🥙 pita', '🥯 bagels', '🥯 english_muffins'] },
+'groceries': { name: '🏪 Groceries', icon: '🏪', color: '#8b5cf6', isFresh: false, subcategories: ['🥫 canned_goods', '🍝 pasta_types', '🥫 sauces_types', '🍯 oils_typed', '🌶️ spices_dried_herbs', '🍰 baking_supplies', '🍿 snacks_chips', '🍪 bread_types', '🍬 candy_types', '🥜 grain_types', '🥜 butters', '🍯 jams_honey', '🥣 grocery_combos', '🥣 broths_stocks', '☕ coffee_tea', '🧃 juices_drinks', '💧 water_soda', '🥣 breakfast_cereals', '🍫 granola_bars', '🍰 rice_cakes', '🌾 flour_meal', '🍬 sugar_sweeteners', '🧂 salt_pepper', '🍞 breadcrumbs', '🥖 croutons', '🥒 pickles_olives', '🫑 salsa_dips', '🍅 mustard_ketchup', '🥗 mayo_dressing', '🍶 soy_sauce', '🌶️ hot_sauce', '🍶 worcestershire', '🍖 barbecue_sauce', '🍶 teriyaki_glaze', '🌿 pesto', '🫘 hummus', '🥜 tahini', '🍶 vinegars', '🫒 cooking_oils', '💨 cooking_sprays', '🎨 food_coloring', '✨ sprinkles', '🍫 baking_chips', '🍫 cocoa_powder', '🍰 cake_mixes', '🍰 frosting', '🥧 pie_fillings', '🍇 dried_fruits', '🌿 dried_seaweed', '🍜 instant_noodles', '🍜 ramen', '🌾 couscous', '🌽 polenta', '🌮 tortillas', '🫓 flatbread', '?? pita', '🥯 bagels', '🥯 english_muffins'] },
 'toiletry': { name: '🧴 Toiletry', icon: '🧴', color: '#ec4898', isFresh: false, subcategories: ['🧴 toiletry_combos', '🧴 shampoo', '🧴 conditioner', '🧴 body_wash', '🧼 soap', '🧴 lotion', '🦵 deodorant', '🪥 toothpaste', '🪥 toothbrush', '🪥 floss', '💧 mouthwash', '🪒 razor', '🪒 shaving_cream', '🌸 feminine_hygiene', '👶 diapers', '🧴 baby_wipes', '🧻 tissue', '🧻 toilet_paper', '🧻 paper_towels', '🤧 kleenex', '⚪ cotton_balls', '🪢 cotton_swabs', '🧴 makeup_remover', '🧼 facial_cleanser', '🧴 moisturizer', '☀️ sunscreen', '💄 lip_balm', '🧴 hand_sanitizer', '🩹 first_aid', '🩹 bandages', '🧴 antiseptic', '🎀 hair_ties', '🪮 brush_comb', '💨 hair_spray', '?? hair_gel', '🧴 dry_shampoo', '🪢 q_tips', '✂️ nail_clipper', '✂️ tweezers', '💄 makeup', '💄 foundation', '👁️ mascara', '💄 lipstick', '💅 nail_polish', '🌸 perfume', '🧴 cologne', '🛁 bath_salts', '🧽 loofah', '🧴 shower_cap', '👂 earplugs', '😴 sleep_mask'] },
 'drinks': { name: '🥤 Drinks', icon: '🥤', color: '#3b82f6', isFresh: false, subcategories: ['🥤 coke', '🍊 fanta_orange', '🥤 sprite', '🥤 coke_zero', '🍇 fanta_grape', '🥤 dr_pepper', '🥤 pepsi', '🥤 mountain_dew', '🥤 creme_soda', '🥤 iron_brew', '🥤 ginger_ale', '🥤 root_beer', '🥤 sarsaparilla', '💧 sparkling_water', '💧 tonic_water', '💧 seltzer', '⚡ energy_drinks', '🏃 sports_drinks', '🥣 mahewu', '🥣 amahewu', '🥣 munkoyo', '🥤 ginger_beer', '🌸 hibiscus_tea', '🍃 rooibos_tea', '🍃 honeybush_tea', '🌳 baobab_juice', '🍈 marula_juice', '🍊 monkey_orange_juice', '🍈 tamarind_drink', '🌾 sorghum_beer_non_alcoholic', '🫚 ginger_ale_african_style', '🍋 lemon_ginger_blast', '🌿 moringa_tea', '🌳 baobab_powder_drink', '🥥 coconut_water', '💧 bottled_water', '🥛 flavored_milk', '🍫 chocolate_milk', '🍓 strawberry_milk', '🥤 milkshakes', '🥣 horlicks', '🥣 nestum', '🥣 ovaltine', '🧃 bottled_juice', '🍊 orange_juice', '🍎 apple_juice', '🍇 grape_juice', '🍍 pineapple_juice', '🥭 mango_juice', '🥭 passion_juice', '🍈 guava_juice', '🍊 mixed_fruit_juice', '🍅 vegetable_juice', '🍅 tomato_juice', '🥕 carrot_juice', '🧊 ice_tea', '🍋 lemonade', '🍋 limeade', '🍊 fruit_punch', '🥤 smoothies', '🍄 kombucha', '🥛 fermented_milk_drink', '🥛 buttermilk', '🥛 lassi', '🥛 yogurt_drink'] },
 'alcohol': { name: '🍺 Alcohol', icon: '🍺', color: '#facc15', isFresh: false, subcategories: ['🍺 umqombothi', '🍺 chibuku', '🌾 traditional_sorghum_beer', '🍺 ginger', '🍷 isundu_palm_wine', '🍺 mukumbi', '🍺 kanyanga', '🌳 bark_beer', '🥣 mahewu_fermented', '🍌 banana_beer', '🥛 milkwine', '🍑 mampoer', '🍑 witblits', '🍈 marula_beer', '🍦 morula_cream', '🍦 amarula_cream_liqueur', '🍊 van_der_hum', '🍇 cape_velvet', '🍫 cremora_liqueur', '🍷 south_african_wine', '🍷 pinotage', '🍷 chenin_blanc', '🍷 sauvignon_blanc', '🍷 cabernet_sauvignon', '🍷 merlot', '🍷 shiraz', '🍷 chardonnay', '🍾 cap_classique', '🍾 methode_cap_classique', '🍷 dessert_wine', '🍷 hanepoot', '🍷 constantia_wine', '🍺 beer', '🍺 castle_lager', '🍺 carling_black_label', '🍺 windhoek_lager', '🍺 hansa', '?? sab_miller', '🍺 castle_light', '🐟 flying_fish', '🍺 amstel', '🍺 heineken', '🍺 corona', '🍺 stella_artois', '🍺 craft_beer', '🍺 darling_brew', '🍺 jack_black', '🍺 devils_peak', '🍺 woodstock_brewery', '🍺 cider', '🍺 savanna_dry', '🍺 hunters_dry', '🍎 apple_cider', '🍐 pear_cider', '🌸 rose_cider', '🍸 gin', '🍸 inverroche', '🍸 hope_on_hop_off', '🌿 botanist_gin', '🌍 african_gin', '🌿 wild_africa_gin', '🍸 vodka', '🍸 crusader_vodka', '🐻 russian_bear', '🍸 smirnoff', '🍸 absolute', '🥃 whiskey', '🥃 bains_whisky', '⛵ three_ships', '🥃 jameson', '🥃 johnnie_walker', '🥃 jack_daniels', '🥃 rum', '🍸 bacardi', '🏴‍☠️ captain_morgan', '🐙 kraken', '🥃 tequila', '🍸 jose_cuervo', '🍹 patron', '🥃 brandy', '🍸 klipdrift', '🍸 richelieu', '🍸 van_ryn', '🍸 olof_bergh', '🍹 liqueurs', '🐘 amarula', '🍸 springbokkie', '🍨 dompedro', '🍸 southern_comfort', '🍸 baileys', '🌿 jägermeister', '🌿 fernet_branca', '🍷 vermouth', '🍷 port', '🍷 sherry', '🍾 sparkling_wine', '🍾 champagne', '🍾 prosecco', '🍾 cava', '🍐 mampoer_pear', '🍑 mampoer_apricot', '🍈 mampoer_marula', '🍚 rice_ale', '🍖 seswaa_ale'] },
@@ -39627,6 +39631,9 @@ for (var retry = 0; retry < 3; retry++) {
     await new Promise(function(r) { setTimeout(r, 1000); });
 }
 products = (p && p.length > 0) ? p.map(function(r) { return r.data; }) : [];
+products = products.filter(function(prod) {
+    return prod && typeof prod === 'object' && prod.id && prod.name;
+});
 
 // Fallback to localStorage backup
 if (products.length === 0) {
@@ -41183,18 +41190,37 @@ function showCourierOptions(orderId) {
             stars += s <= rating ? '⭐' : '☆';
         }
         
-        modalContent += '<div style="border: 1px solid #fbcfe8; border-radius: 12px; padding: 12px; margin-bottom: 12px;">' +
-            '<div class="flex-row" style="justify-content: space-between;">' +
-            '<strong>' + escapeHtml(c.name) + '</strong>' +
-            '<div>' + stars + ' (' + rating.toFixed(1) + ')</div>' +
+        // Courier picture
+        var courierPic = c.profilePicture || c.photo || c.image || '';
+        var picHtml = courierPic ? 
+            '<img src="' + courierPic + '" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:2px solid #fbcfe8;flex-shrink:0;">' :
+            '<div style="width:60px;height:60px;border-radius:50%;background:#fdf2f8;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:2px solid #fbcfe8;">🛵</div>';
+        
+        // Mask phone
+        var phoneDisplay = c.fullPhone || c.phone || '';
+        if (phoneDisplay.length >= 4) phoneDisplay = '••••' + phoneDisplay.slice(-4);
+        
+        modalContent += '<div style="border: 1px solid #fbcfe8; border-radius: 12px; padding: 14px; margin-bottom: 12px; background:white;">' +
+            '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">' +
+            picHtml +
+            '<div style="flex:1;">' +
+            '<div style="font-weight:700;font-size:14px;">' + escapeHtml(c.name) + '</div>' +
+            '<div style="font-size:11px;color:#6b7280;">🚲 ' + escapeHtml(c.vehicleType || 'Motorcycle') + '</div>' +
+            '<div style="font-size:11px;">' + stars + ' <span style="color:#6b7280;">' + (rating || 0).toFixed(1) + ' (' + (c.ratingCount || c.totalDeliveries || 0) + ' reviews)</span></div>' +
             '</div>' +
-            '<div class="text-small">🚲 ' + c.vehicleType + ' · 📍 ' + c.distance.toFixed(1) + 'km from you</div>' +
-            '<div class="text-small">📦 ' + (c.totalDeliveries || 0) + ' deliveries completed</div>' +
-            '<div class="text-small">💰 Estimated fee: P' + Math.round(estimatedFee) + '</div>' +
-            '<div class="text-small">📞 Phone: ' + c.fullPhone + '</div>' +
-            '<div style="display: flex; gap: 8px; margin-top: 12px;">' +
-            '<button class="pink-btn" onclick="selectCourierForOrder(\'' + orderId + '\', \'' + c.id + '\', ' + Math.round(estimatedFee) + ')" style="flex: 1;">Select Courier</button>' +
-            '<button class="pink-btn-outline" onclick="viewCourierReviews(\'' + c.id + '\')" style="flex: 1;">📋 View Reviews</button>' +
+            '<div style="text-align:right;">' +
+            '<div style="font-size:11px;color:#6b7280;">📍 ' + (c.distance ? c.distance.toFixed(1) + ' km' : 'Nearby') + '</div>' +
+            '<div style="font-weight:700;color:#ec4899;">P' + Math.round(estimatedFee) + '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div style="background:#f9fafb;border-radius:10px;padding:8px;margin-bottom:8px;">' +
+            '<div style="font-size:11px;"><strong>📞</strong> ' + escapeHtml(phoneDisplay) + '</div>' +
+            '<div style="font-size:11px;"><strong>📦</strong> ' + (c.totalDeliveries || 0) + ' deliveries</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:8px;">' +
+            '<button class="pink-btn" onclick="selectCourierForOrder(\'' + orderId + '\', \'' + c.id + '\', ' + Math.round(estimatedFee) + ')" style="flex:2;padding:10px;font-size:12px;">✅ Select</button>' +
+            '<button class="pink-btn-outline" onclick="viewCourierReviews(\'' + c.id + '\')" style="flex:1;font-size:11px;">⭐ Reviews</button>' +
+            '<button class="pink-btn-outline" onclick="viewCourierProfile(\'' + c.id + '\')" style="flex:1;font-size:11px;">👤 Profile</button>' +
             '</div>' +
             '</div>';
     }
@@ -43745,7 +43771,7 @@ function requestSellerPayout() {
     
     createModal({
         id: 'payout_request_modal',
-        title: '💰 Request Payout',
+        title: '?? Request Payout',
         content: modalContent,
         showCloseButton: true,
         width: '400px'
@@ -43813,7 +43839,6 @@ function renderActiveOrdersForSeller(orders) {
         var order = orders[i];
         if (!order || !order.id) continue;
         
-        // ===== SAFETY: Handle both booking and regular orders =====
         var totalItems = 0;
         if (order.items && order.items.length > 0) {
             for (var j = 0; j < order.items.length; j++) {
@@ -43823,7 +43848,6 @@ function renderActiveOrdersForSeller(orders) {
         
         var statusInfo = getOrderStatusInfo(order.status);
         
-        // Google Maps link for buyer location
         var buyerLat = order.buyerLat;
         var buyerLng = order.buyerLng;
         var buyerLocation = order.buyerLocation || 'Not specified';
@@ -43853,7 +43877,6 @@ function renderActiveOrdersForSeller(orders) {
                 '<div style="font-size:14px;font-weight:600;margin-bottom:4px;">' + escapeHtml(order.productName || 'Booking') + '</div>' +
                 '<div class="text-small">👤 ' + escapeHtml(order.buyerName || 'Customer') + '</div>';
             
-            // Check-in/out status indicators
             if (order.checkedIn || order.checkedOut || order.refunded) {
                 html += '<div style="display:flex;gap:4px;margin-top:6px;">';
                 if (order.checkedIn) html += '<span style="font-size:9px;background:#d1fae5;color:#059669;padding:2px 6px;border-radius:8px;">✅ In</span>';
@@ -43871,97 +43894,84 @@ function renderActiveOrdersForSeller(orders) {
                 html += '<div class="text-small">📅 Check-out: ' + days[co.getDay()] + ' ' + co.getDate() + ' ' + months[co.getMonth()] + ' ' + co.getFullYear() + '</div>';
                 html += '<div class="text-small">Duration: ' + (order.duration || 1) + ' ' + (order.durationUnit || 'night') + (order.duration > 1 ? 's' : '') + '</div>';
             }
-            if (order.timeSlot) {
-                html += '<div class="text-small">⏰ Time: ' + order.timeSlot + '</div>';
-            }
-            if (order.guests > 1) {
-                html += '<div class="text-small">👤 Guests: ' + order.guests + '</div>';
-            }
-            if (order.rooms > 1) {
-                html += '<div class="text-small">🏨 Rooms: ' + order.rooms + '</div>';
-            }
-            if (order.requests) {
-                html += '<div class="text-small">📝 Requests: ' + escapeHtml(order.requests) + '</div>';
-            }
+            if (order.timeSlot) html += '<div class="text-small">⏰ Time: ' + order.timeSlot + '</div>';
+            if (order.guests > 1) html += '<div class="text-small">👤 Guests: ' + order.guests + '</div>';
+            if (order.rooms > 1) html += '<div class="text-small">🏨 Rooms: ' + order.rooms + '</div>';
+            if (order.requests) html += '<div class="text-small">📝 Requests: ' + escapeHtml(order.requests) + '</div>';
             
             html += '<div style="font-weight:700;color:#ec4899;margin:6px 0;">💰 Total: ' + formatBWP(order.totalPrice || order.total || 0) + '</div>';
             
-            // Walk-in payment info
             if (isWalkIn) {
                 html += '<div style="font-size:10px;color:#059669;">💵 ' + formatBWP(order.amountPaid || order.totalPrice || 0) + ' (' + (order.paymentMethod || 'Cash') + ') • No fee</div>';
             }
             
             html += '<div class="text-small" style="color:#9ca3af;">📅 Placed: ' + new Date(order.createdAt).toLocaleString() + '</div>';
             
-            // / Payment proof for pending_payment
+            // Proof of Payment
             if (order.status === 'pending_payment') {
                 if (order.proofOfPayment) {
                     html += '<div style="background:#d1fae5;border-radius:8px;padding:10px;margin-top:8px;">' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;">' +
                         '<span class="text-small" style="color:#059669;">💳 Payment Proof Submitted</span>' +
                         '<button onclick="viewOrderProof(\'' + order.id + '\')" style="padding:6px 14px;background:#10b981;color:white;border:none;border-radius:15px;font-size:11px;cursor:pointer;">👁️ View Proof</button>' +
-                        '</div>' +
-                        '</div>';
+                        '</div></div>';
                 } else {
                     html += '<div style="background:#fef3c7;border-radius:8px;padding:10px;margin-top:8px;text-align:center;">' +
-                        '<span class="text-small" style="color:#92400e;">⏳ Waiting for buyer to upload payment proof</span>' +
-                        '</div>';
+                        '<span class="text-small" style="color:#92400e;">⏳ Waiting for payment proof</span></div>';
                 }
-            } 
+            }
             
-            // Check-in/out status messages
+            // Always show proof if exists (even after confirmation)
+            if (order.proofOfPayment && order.status !== 'pending_payment') {
+                html += '<div style="margin-top:4px;">' +
+                    '<button onclick="viewOrderProof(\'' + order.id + '\')" style="padding:4px 10px;background:#e0f2fe;color:#0369a1;border:none;border-radius:10px;font-size:10px;cursor:pointer;">👁️ View Payment Proof</button>' +
+                    '</div>';
+            }
+            
+            // Dispute
+            if (order.status === 'disputed') {
+                html += '<div style="background:#fee2e2;border-radius:8px;padding:10px;margin-top:8px;">' +
+                    '<span class="text-small" style="color:#dc2626;">⚠️ Buyer filed a dispute</span>' +
+                    '<button onclick="showOrderCommunication(\'' + order.id + '\')" style="margin-top:6px;width:100%;padding:8px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:15px;font-size:11px;cursor:pointer;">💬 Respond</button>' +
+                    '</div>';
+            }
+            
             if (order.checkedOut && order.paidToSeller) {
                 html += '<div style="background:#d1fae5;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
                     '<span style="font-size:12px;color:#059669;font-weight:600;">✅ Guest Checked Out</span><br>' +
-                    '<span class="text-small">💰 Funds released to your balance</span>' +
-                    '</div>';
+                    '<span class="text-small">💰 Funds released</span></div>';
             } else if (order.checkedIn && !order.checkedOut) {
                 html += '<div style="background:#e0f2fe;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
                     '<span style="font-size:12px;color:#0369a1;font-weight:600;">🏨 Guest Checked In</span><br>' +
-                    '<span class="text-small">Waiting for check-out</span>' +
-                    '</div>';
+                    '<span class="text-small">Waiting for check-out</span></div>';
             } else if (!order.checkedIn && (order.status === 'payment_confirmed' || order.status === 'confirmed')) {
                 html += '<div style="background:#fef3c7;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
-                    '<span class="text-small" style="color:#92400e;">⏳ Awaiting check-in</span>' +
-                    '</div>';
+                    '<span class="text-small" style="color:#92400e;">⏳ Awaiting check-in</span></div>';
             }
             
-            // Cancelled
             if (order.status === 'cancelled') {
                 html += '<div style="background:#fee2e2;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
                     '<span class="text-small" style="color:#dc2626;">❌ Cancelled: ' + (order.cancellationReason || 'No reason') + '</span>' +
-                    (order.refunded ? '<br><span class="text-small">↩️ Refunded: ' + formatBWP(order.refundAmount || 0) + '</span>' : '') +
-                    '</div>';
+                    (order.refunded ? '<br><span class="text-small">↩️ Refunded: ' + formatBWP(order.refundAmount || 0) + '</span>' : '') + '</div>';
             }
             
-            // ===== ACTION BUTTONS =====
             html += '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">';
-            
-            // Manage button (always show)
             html += '<button onclick="showBookingManagement(&quot;' + order.id + '&quot;)" style="flex:1;min-width:100px;padding:8px;background:#ec4899;color:white;border:none;border-radius:15px;font-size:11px;font-weight:600;cursor:pointer;">📋 Manage</button>';
             
-            // Quick check-in button (if not checked in and not cancelled)
             if (!order.checkedIn && !order.refunded && order.status !== 'cancelled' && order.status !== 'pending' && order.status !== 'pending_payment') {
                 html += '<button onclick="markCheckIn(\'' + order.id + '\')" style="padding:8px 12px;background:#10b981;color:white;border:none;border-radius:15px;font-size:11px;cursor:pointer;">✅ In</button>';
             }
-            
-            // Quick check-out button (if checked in but not out)
             if (order.checkedIn && !order.checkedOut && !order.refunded) {
                 html += '<button onclick="markCheckOut(\'' + order.id + '\')" style="padding:8px 12px;background:#3b82f6;color:white;border:none;border-radius:15px;font-size:11px;cursor:pointer;">🏨 Out</button>';
             }
-            
-            // Message (online bookings only)
             if (!isWalkIn) {
-                html += '<button onclick="showOrderCommunication(\'' + order.id + '\')" style="padding:8px 12px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;border-radius:15px;font-size:11px;cursor:pointer;">✉️ </button>';
+                html += '<button onclick="showOrderCommunication(\'' + order.id + '\')" style="padding:8px 12px;background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;border-radius:15px;font-size:11px;cursor:pointer;">✉️</button>';
             }
-            
-            // Remove walk-in
             if (isWalkIn && !order.checkedIn) {
                 html += '<button onclick="removeWalkInBooking(\'' + order.id + '\')" style="padding:8px 12px;background:#fee2e2;color:#ef4444;border:1px solid #fecaca;border-radius:15px;font-size:11px;cursor:pointer;">🗑️</button>';
             }
+            html += '</div></div>';
             
-            html += '</div>';
-            html += '</div>';
         } else {
             // ===== REGULAR PRODUCT ORDER CARD =====
             html += '<div style="border: 1px solid #fbcfe8; border-radius: 12px; padding: 12px; margin-bottom: 12px; border-left: 4px solid ' + statusInfo.color + ';">' +
@@ -43975,64 +43985,66 @@ function renderActiveOrdersForSeller(orders) {
                 '<div class="text-small">📦 Items: ' + totalItems + ' | Total: ' + formatBWP(order.total) + '</div>' +
                 '<div class="text-small">📅 Placed: ' + new Date(order.createdAt).toLocaleString() + '</div>';
             
-             // Payment proof for pending_payment
+            // Payment proof for pending_payment
             if (order.status === 'pending_payment') {
                 if (order.proofOfPayment) {
                     html += '<div style="background:#d1fae5;border-radius:8px;padding:10px;margin-top:8px;">' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;">' +
                         '<span class="text-small" style="color:#059669;">📸 Payment Proof Submitted</span>' +
                         '<button onclick="viewOrderProof(\'' + order.id + '\')" style="padding:6px 14px;background:#10b981;color:white;border:none;border-radius:15px;font-size:11px;cursor:pointer;">👁️ View Proof</button>' +
-                        '</div>' +
-                        '</div>';
+                        '</div></div>';
                 } else {
                     html += '<div style="background:#fef3c7;border-radius:8px;padding:10px;margin-top:8px;text-align:center;">' +
-                        '<span class="text-small" style="color:#92400e;">⏳ Waiting for buyer to upload payment proof</span>' +
-                        '</div>';
+                        '<span class="text-small" style="color:#92400e;">⏳ Waiting for payment proof</span></div>';
                 }
             }
             
-            // Payment Confirmed - Prepare Shipping
+            // Always show proof if exists
+            if (order.proofOfPayment && order.status !== 'pending_payment') {
+                html += '<div style="margin-top:4px;">' +
+                    '<button onclick="viewOrderProof(\'' + order.id + '\')" style="padding:4px 10px;background:#e0f2fe;color:#0369a1;border:none;border-radius:10px;font-size:10px;cursor:pointer;">👁️ View Payment Proof</button>' +
+                    '</div>';
+            }
+            
+            // Dispute
+            if (order.status === 'disputed') {
+                html += '<div style="background:#fee2e2;border-radius:8px;padding:10px;margin-top:8px;">' +
+                    '<span class="text-small" style="color:#dc2626;">⚠️ Buyer filed a dispute</span>' +
+                    '<button onclick="showOrderCommunication(\'' + order.id + '\')" style="margin-top:6px;width:100%;padding:8px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:15px;font-size:11px;cursor:pointer;">💬 Respond to Dispute</button>' +
+                    '</div>';
+            }
+            
             if (order.status === 'payment_confirmed') {
                 html += '<div style="margin-top: 12px;">' +
-                    '<button class="pink-btn" onclick="processOrderForShipping(\'' + order.id + '\')" style="width: 100%; background: #10b981;">📦 Prepare for Shipping</button>' +
-                    '</div>';
+                    '<button class="pink-btn" onclick="processOrderForShipping(\'' + order.id + '\')" style="width: 100%; background: #10b981;">📦 Prepare for Shipping</button></div>';
             }
             
-            // Processing
             if (order.status === 'processing') {
                 html += '<div style="background:#fef3c7;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
-                    '<span class="text-small" style="color:#92400e;">📦 Order is being prepared</span>' +
-                    '</div>';
+                    '<span class="text-small" style="color:#92400e;">📦 Order is being prepared</span></div>';
             }
             
-            // With Courier / En Route
             if (order.status === 'with_courier' || order.status === 'en_route') {
                 html += '<div class="text-small" style="color: #f59e0b; margin-top: 8px;">🚚 Courier: ' + (order.courierName || 'Assigned') + ' - ' + (order.courierStatus === 'picked_up' ? 'Picked up' : 'En route') + '</div>' +
                     '<button class="pink-btn-outline" onclick="trackCourier(\'' + order.id + '\')" style="width: 100%;">📍 Track Courier</button>' +
                     '<div class="text-small" style="color: #6b7280;">⏳ Awaiting buyer confirmation</div>';
             }
             
-            // Shipped
             if (order.status === 'shipped') {
                 html += '<div class="text-small" style="color: #3b82f6; margin-top: 8px;">🚚 Shipped on: ' + new Date(order.shippedDate).toLocaleString() + '</div>' +
                     (order.trackingNumber ? '<div class="text-small">📮 Tracking: ' + order.trackingNumber + '</div>' : '') +
                     '<div style="margin-top: 12px;">' +
-                    '<button class="pink-btn-outline" onclick="checkDeliveryStatus(\'' + order.id + '\')" style="width: 100%;">📬 Check Status</button>' +
-                    '</div>';
+                    '<button class="pink-btn-outline" onclick="checkDeliveryStatus(\'' + order.id + '\')" style="width: 100%;">📬 Check Status</button></div>';
             }
             
-            // Delivered
             if (order.status === 'delivered' && order.deliveryConfirmedDate) {
                 html += '<div style="background:#d1fae5;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
-                    '<span class="text-small" style="color:#059669;">✅ Delivered: ' + new Date(order.deliveryConfirmedDate).toLocaleDateString() + '</span>' +
-                    '</div>';
+                    '<span class="text-small" style="color:#059669;">✅ Delivered: ' + new Date(order.deliveryConfirmedDate).toLocaleDateString() + '</span></div>';
             }
             
-            // Cancelled
             if (order.status === 'cancelled') {
                 html += '<div style="background:#fee2e2;border-radius:8px;padding:8px;margin-top:8px;text-align:center;">' +
-                    '<span class="text-small" style="color:#dc2626;">❌ Cancelled: ' + (order.cancellationReason || 'No reason given') + '</span>' +
-                    '</div>';
+                    '<span class="text-small" style="color:#dc2626;">❌ Cancelled: ' + (order.cancellationReason || 'No reason given') + '</span></div>';
             }
             
             html += '<button class="pink-btn-outline" onclick="showOrderCommunication(\'' + order.id + '\')" style="margin-top: 8px; width: 100%;">💬 Message Buyer</button>' +
@@ -46650,7 +46662,7 @@ function renderSellerDashboard() {
                 '<h4 style="margin-bottom: 16px;">🚚 Active Courier Deliveries (' + activeCourierDeals.length + ')</h4>' +
                 renderActiveCourierDeals(activeCourierDeals) +
             '</div>' : '') +
-        renderShippingSettingsSection() +
+        
         // Add Product Form
         renderAddProductFormWithCategories() +
         
@@ -54529,7 +54541,10 @@ function addPopupStyles() {
     document.head.appendChild(style);
 }
 function addToRecentlyViewed(productId) {
-    var recentlyViewed = loadFromStorage('bringmine_recently_viewed', []);
+    // Load from localStorage
+    var recentlyViewed = [];
+    var saved = localStorage.getItem('bringmine_recently_viewed');
+    if (saved) { try { recentlyViewed = JSON.parse(saved); } catch(e) {} }
     
     // Remove if already exists
     recentlyViewed = recentlyViewed.filter(function(id) { return id !== productId; });
@@ -54540,14 +54555,40 @@ function addToRecentlyViewed(productId) {
     // Keep only last 10
     recentlyViewed = recentlyViewed.slice(0, 10);
     
-    saveToStorage('bringmine_recently_viewed', recentlyViewed);
+    // Save to localStorage
+    localStorage.setItem('bringmine_recently_viewed', JSON.stringify(recentlyViewed));
+    
+    // Sync to Supabase
+    if (typeof supabaseClient !== 'undefined' && supabaseClient && currentUser) {
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].phone === currentUser.phone) {
+                users[i].recentlyViewed = recentlyViewed;
+                saveToSupabase('users', currentUser.phone, users[i]);
+                break;
+            }
+        }
+    }
 }
 
 // Get recently viewed products
 function getRecentlyViewedProducts() {
-    var recentlyViewedIds = loadFromStorage('bringmine_recently_viewed', []);
-    var recentProducts = [];
+    // Load from localStorage
+    var recentlyViewedIds = [];
+    var saved = localStorage.getItem('bringmine_recently_viewed');
+    if (saved) { try { recentlyViewedIds = JSON.parse(saved); } catch(e) {} }
     
+    // If empty, check user record from Supabase
+    if (recentlyViewedIds.length === 0 && currentUser) {
+        for (var u = 0; u < users.length; u++) {
+            if (users[u].phone === currentUser.phone && users[u].recentlyViewed) {
+                recentlyViewedIds = users[u].recentlyViewed;
+                localStorage.setItem('bringmine_recently_viewed', JSON.stringify(recentlyViewedIds));
+                break;
+            }
+        }
+    }
+    
+    var recentProducts = [];
     for (var i = 0; i < recentlyViewedIds.length; i++) {
         var product = products.find(function(p) { return p.id === recentlyViewedIds[i]; });
         if (product && product.approved) {
@@ -55098,7 +55139,7 @@ function renderHomeScreen() {
 if (p.approved && p.stock > 0 && imgs && imgs.length > 0) allProducts.push(p);
     }
     allProducts.sort(function(a, b) { return (a.distance || 999) - (b.distance || 999); });
-    var featuredProducts = allProducts.slice(0, 20);
+    var featuredProducts = allProducts.slice(0, 60);
     
     var socialProofs = typeof getNearbySocialProof === 'function' ? getNearbySocialProof() : [];
     socialProofs = socialProofs.slice(0, 5);
@@ -75521,16 +75562,27 @@ window.getSavedPaymentMethods = function() {
 };
 
 // 2. Recently Viewed Products
-var recentlyViewed = loadFromStorage('bringmine_recently_viewed', []);
+// Global initialization
+var recentlyViewed = [];
+var savedRV = localStorage.getItem('bringmine_recently_viewed');
+if (savedRV) { try { recentlyViewed = JSON.parse(savedRV); } catch(e) {} }
 
 window.addToRecentlyViewed = function(productId) {
-    // Remove if already exists
     recentlyViewed = recentlyViewed.filter(function(id) { return id !== productId; });
-    // Add to front
     recentlyViewed.unshift(productId);
-    // Keep only last 10
     recentlyViewed = recentlyViewed.slice(0, 10);
-    saveToStorage('bringmine_recently_viewed', recentlyViewed);
+    
+    localStorage.setItem('bringmine_recently_viewed', JSON.stringify(recentlyViewed));
+    
+    if (typeof supabaseClient !== 'undefined' && supabaseClient && currentUser) {
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].phone === currentUser.phone) {
+                users[i].recentlyViewed = recentlyViewed;
+                saveToSupabase('users', currentUser.phone, users[i]);
+                break;
+            }
+        }
+    }
 };
 
 window.getRecentlyViewed = function() {
