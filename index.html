@@ -56531,7 +56531,11 @@ window.showProductDetails = function(productId) {
     html += '<div style="display:flex;justify-content:space-between;font-size:12px;"><span id="subtotalLine">1 x ' + formatBWP(discountedPrice) + '</span><span id="subtotalVal">' + formatBWP(subTotal) + '</span></div>';
     if (savings > 0) html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#059669;"><span>Savings</span><span id="savingsVal">-' + formatBWP(savings) + '</span></div>';
     if (product.type !== 'service') {
-    html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span>🚚 Delivery</span><span style="color:' + (shipping===0?'#10b981':'#374151') + ';" id="shippingVal">' + (shipping===0?'FREE':formatBWP(shipping)) + '</span></div>';
+    var shippingLabel = shipping === 0 ? 'FREE' : formatBWP(shipping);
+if (shipping === 0 && product.offersFreeShipping && product.freeShippingKm > 0) {
+    shippingLabel = 'FREE (within ' + product.freeShippingKm + 'km)';
+}
+html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span>🚚 Delivery</span><span style="color:' + (shipping===0?'#10b981':'#374151') + ';" id="shippingVal">' + shippingLabel + '</span></div>';
 }
     html += '<div style="border-top:1px dashed #bbf7d0;padding-top:8px;display:flex;justify-content:space-between;"><span style="font-weight:700;">Total</span><span style="color:#ec4899;font-size:20px;font-weight:800;" id="totalVal">' + formatBWP(discountedPrice + shipping) + '</span></div>';
     html += '</div>';
@@ -56592,7 +56596,38 @@ html += '<div style="background:#f0f9ff;border:1px solid #bfdbfe;border-radius:1
     window._detailSelIdx = selIdx;
     window._detailVarietyId = varietyId;
     window._detailVarietyLabel = varietyLabel;
+    // ===== RELATED PRODUCTS =====
+    var relatedProducts = [];
+    for (var r = 0; r < products.length; r++) {
+        if (products[r].id !== product.id && 
+            products[r].mainCategory === product.mainCategory && 
+            products[r].approved && products[r].stock > 0 &&
+            products[r]._images && products[r]._images.length > 0) {
+            relatedProducts.push(products[r]);
+        }
+    }
+    relatedProducts = relatedProducts.slice(0, 6);
     
+    if (relatedProducts.length > 0) {
+        html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #fbcfe8;">' +
+            '<div style="font-weight:700;font-size:16px;color:#1f2937;margin-bottom:10px;">📦 Similar Products</div>' +
+            '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;">';
+        
+        for (var r = 0; r < relatedProducts.length; r++) {
+            var rp = relatedProducts[r];
+            var rpImg = getProductImages(rp.id);
+            var rpThumb = (rpImg && rpImg.length > 0) ? rpImg[0] : rp._images[0];
+            
+            html += '<div onclick="closeCurrentModal();showProductDetails(\'' + rp.id + '\')" style="min-width:140px;background:white;border-radius:14px;overflow:hidden;border:1px solid #f3f4f6;cursor:pointer;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.05);">' +
+                '<img src="' + rpThumb + '" style="width:100%;height:110px;object-fit:cover;">' +
+                '<div style="padding:10px;">' +
+                '<div style="font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px;">' + escapeHtml(rp.name).substring(0, 30) + (rp.name.length > 30 ? '...' : '') + '</div>' +
+                '<div style="font-size:14px;font-weight:700;color:#ec4899;">' + formatBWP(rp.price) + '</div>' +
+                '<div style="font-size:10px;color:#6b7280;">per ' + (rp.unit || 'item') + '</div>' +
+                '</div></div>';
+        }
+        html += '</div></div>';
+    }
     createModal({
         id: 'product_details_modal',
         title: '',
