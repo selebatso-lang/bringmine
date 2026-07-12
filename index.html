@@ -3152,7 +3152,7 @@ var SUPPORTED_CURRENCIES = [
     { code: 'XOF', symbol: 'CFA', name: 'West African CFA', flag: '🌍' },
     { code: 'ZMW', symbol: 'ZK', name: 'Zambian Kwacha', flag: '🇿🇲' },
     { code: 'MWK', symbol: 'MK', name: 'Malawian Kwacha', flag: '🇲🇼' },
-    { code: 'MZN', symbol: 'MT', name: 'Mozambican Metical', flag: '🇲🇿' },
+    { code: 'MZN', symbol: 'MT', name: 'Mozambican Metical', flag: '??🇿' },
     { code: 'AOA', symbol: 'Kz', name: 'Angolan Kwanza', flag: '🇦🇴' },
     { code: 'NAD', symbol: 'N$', name: 'Namibian Dollar', flag: '🇳🇦' },
     { code: 'SZL', symbol: 'E', name: 'Swazi Lilangeni', flag: '🇸🇿' },
@@ -16967,7 +16967,7 @@ async function checkout() {
             }
         }
         
-        var totalShipping = hasFreeShipping ? 0 : group.totalShipping;
+        var totalShipping = group.totalShipping;
         var serviceFee = Math.round((group.subtotal + totalShipping) * 0.08 * 100) / 100;
         
         // ===== FIXED: Create order items with CORRECT variety prices =====
@@ -17189,7 +17189,7 @@ async function checkout() {
         for (var i = 0; i < createdOrders.length; i++) {
             saveToSupabase('orders', createdOrders[i].id, createdOrders[i]);
         }
-        saveToSupabase('products', 'bulk', products);
+        
     }
 }
 function showCombinedPaymentOptions(ordersList, totalAmount) {
@@ -17881,7 +17881,7 @@ function renderCartScreen() {
         
         var distance = product.distance || 0;
         // FIXED: Check if seller offers free shipping
-        var shippingCost = product.offersFreeShipping === true ? 0 : calculateShippingFee(distance, currentQty, product);
+        var shippingCost = calculateShippingFee(distance, currentQty, product);
         var itemPrice = cartItem.price || product.price;
         
         var discountedPrice = calculateBulkDiscount(product, currentQty, itemPrice);
@@ -17893,9 +17893,7 @@ function renderCartScreen() {
         
         totalSubtotal += itemSubtotal;
         // FIXED: Only add to total shipping if not free
-        if (product.offersFreeShipping !== true) {
-            totalShippingCost += shippingCost;
-        }
+        totalShippingCost += shippingCost;
         totalItemCount += currentQty;
         totalDiscountSavedAll += itemSavings;
         
@@ -17919,7 +17917,7 @@ function renderCartScreen() {
             '<div style="font-size:12px;color:#6b7280;">📍 ' + distance.toFixed(1) + ' km from your location</div>' +
             (varietyDisplayHtml ? varietyDisplayHtml : '') +
             '<div style="font-size:12px;color:#6b7280;">📦 Min: ' + minOrder + ' | Max: ' + maxOrder + ' ' + product.unit + '(s)</div>' +
-            (product.offersFreeShipping === true ? '<div style="font-size:12px;color:#10b981;margin-top:4px;">🚚 FREE SHIPPING offered by seller</div>' : '') +
+            (product.offersFreeShipping === true ? '<div style="font-size:12px;color:#10b981;margin-top:4px;">🚚 Free shipping within ' + (product.freeShippingKm || 5) + 'km</div>' : '') +
             '</div>' +
             '</div>';
         
@@ -17967,7 +17965,7 @@ function renderCartScreen() {
             '<div style="flex:1;">' +
             '<div style="font-weight:600;margin-bottom:4px;">🚚 Delivery Information</div>' +
             '<div style="font-size:12px;color:#6b7280;">📍 Distance: ' + distance.toFixed(1) + ' km from your location</div>' +
-            (product.offersFreeShipping === true ? '<div style="font-size:12px;color:#10b981;margin-top:4px;">✅ Seller covers shipping cost</div>' : '') +
+            (product.offersFreeShipping === true ? '<div style="font-size:12px;color:#10b981;margin-top:4px;">✅ Seller offers free shipping (within ' + (product.freeShippingKm || 5) + 'km)</div>' : '') +
             '</div>' +
             '<div style="text-align:right;">' +
             '<div style="font-size:12px;color:#6b7280;">Shipping Fee</div>' +
@@ -21269,8 +21267,10 @@ var mainImage = (pImages && pImages.length > 0) ? pImages[0] : (p._cachedImage |
             distanceDisplay = distRounded + ' km';
             shipping = calculateShippingFee(distance, 1, p);
             
-            if (p.offersFreeShipping === true || shipping === 0) {
+            if (shipping === 0) {
                 shippingDisplay = 'FREE SHIPPING ';
+            } else if (p.offersFreeShipping === true) {
+                shippingDisplay = 'From FREE';
             } else {
                 shippingDisplay = formatBWP(shipping);
             }
@@ -21347,7 +21347,7 @@ productsHtml += '<div class="product-card" onclick="showProductDetails(\'' + p.i
     (p._isPromoted ? '<div style="position:absolute;top:8px;left:8px;background:#f59e0b;color:white;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:600;">🌟 Promoted</div>' : '') +
     (discountInfo && discountInfo.hasDiscount ? '<div style="position:absolute;top:8px;' + (p._isPromoted ? 'left:100px;' : 'left:8px;') + 'background:#ef4444;color:white;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:600;">-' + discountInfo.discountPercent + '% OFF</div>' : '') +
     (p.type === 'service' && p.booking && p.booking.enabled ? '<div style="position:absolute;bottom:8px;left:8px;background:#3b82f6;color:white;padding:2px 8px;border-radius:12px;font-size:9px;font-weight:700;">📅 Bookable</div>' : '') +
-    (p.type !== 'service' && p.offersFreeShipping === true ? '<div style="position:absolute;top:8px;right:8px;background:#10b981;color:white;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:600;">🚚 FREE SHIPPING</div>' : '') +
+    (p.type !== 'service' && p.offersFreeShipping === true ? '<div style="position:absolute;top:8px;right:8px;background:#10b981;color:white;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:600;">🚚 Free Shipping*</div>' : '') +
     (variantInfo ? '<div style="position:absolute;bottom:8px;left:8px;background:#7c3aed;color:white;padding:2px 8px;border-radius:12px;font-size:9px;">🎨 ' + variantInfo + '</div>' : '') +
     // ===== SHARE BUTTON (GRID VIEW) =====
     '<button onclick="event.stopPropagation();shareProduct(\'' + p.id + '\', \'' + escapeHtml(p.name).replace(/'/g, "\\'") + '\')" title="Share this product" style="position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.9);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,0.2);">📤</button>' +
@@ -24094,33 +24094,9 @@ function groupCartBySeller(cartData) {
         sellerGroups[sellerId].totalQuantity += cartItem.quantity;
     }
     
-    // Apply bulk shipping discount per seller
-    for (var sellerId in sellerGroups) {
-        var group = sellerGroups[sellerId];
-        var hasFreeShipping = false;
-        
-        // Check if any item has free shipping
-        for (var i = 0; i < group.items.length; i++) {
-            if (group.items[i].offersFreeShipping) {
-                hasFreeShipping = true;
-                break;
-            }
-        }
-        
-        if (hasFreeShipping) {
-            group.totalShipping = 0;
-        } else if (group.totalQuantity <= 5) {
-            // Find highest shipping cost item
-            var highestShipping = 0;
-            for (var i = 0; i < group.items.length; i++) {
-                if (group.items[i].shipping > highestShipping) {
-                    highestShipping = group.items[i].shipping;
-                }
-            }
-            group.totalShipping = highestShipping;
-        }
-        // Otherwise keep the calculated totalShipping
-    }
+      // Shipping is already calculated per-item using calculateShippingFee
+    // which returns 0 when within free shipping range, and actual cost when beyond.
+    // Keep the calculated totalShipping as-is — no override needed.
     
     return sellerGroups;
 }
@@ -28201,7 +28177,7 @@ window.refreshGPS = function () {
  requestGPS()
         .then(() => {
             addNotification(currentUser.phone, '📍 GPS Updated', 'Location updated');
-            alert('📍 GPS updated');
+            alert('?? GPS updated');
         })
         .catch(err => alert('GPS error: ' + err));
 };
@@ -30804,11 +30780,11 @@ const PRODUCT_CATEGORIES = {
 // ========== NON-PROFIT & COMMUNITY ==========
 'nonprofit': { name: '🤝 Non-Profit & Community', icon: '🤝', color: '#10b981', subcategories: ['🎁 charity_donations', '🙋 volunteer_opportunities', '🎪 community_events', '🥫 food_banks', '🏠 shelters', '🤲 mutual_aid', '📢 fundraising_campaigns', '⛪ religious_services'] },
 'charity_donations': { name: '🎁 Charity Donations', icon: '🎁', color: '#ec4899', parent: 'nonprofit', subcategories: ['💰 cash_donations', '📦 goods_donations', '🚗 vehicle_donations', '📅 monthly_giving', '🕯️ memorial_donations', '🏢 corporate_giving'] },
-'volunteer_opportunities': { name: '🙋 Volunteer Opportunities', icon: '🙋', color: '#3b82f6', parent: 'nonprofit', subcategories: ['🎪 one_time_volunteer', '🔄 ongoing_volunteer', '💻 virtual_volunteer', '🏢 corporate_volunteer', '🧒 youth_volunteer', '👴 senior_volunteer'] },
+'volunteer_opportunities': { name: '🙋 Volunteer Opportunities', icon: '🙋', color: '#3b82f6', parent: 'nonprofit', subcategories: ['🎪 one_time_volunteer', '🔄 ongoing_volunteer', '💻 virtual_volunteer', '🏢 corporate_volunteer', '🧒 youth_volunteer', '?? senior_volunteer'] },
 'community_events': { name: '🎪 Community Events', icon: '🎪', color: '#f59e0b', parent: 'nonprofit', subcategories: ['🎭 parades', '🛒 farmers_markets', '🧹 community_cleanups', '🎉 block_parties', '🏃 charity_runs', '🥫 food_drives', '🧥 coat_drives'] },
 'food_banks': { name: '🥫 Food Banks', icon: '🥫', color: '#10b981', parent: 'nonprofit', subcategories: ['🥫 food_pantries', '🍲 meal_programs', '🥣 soup_kitchens', '🚚 food_distribution', '🎒 weekend_backpacks', '👴 senior_meal_delivery'] },
 'shelters': { name: '🏠 Shelters', icon: '🏠', color: '#8b5cf6', parent: 'nonprofit', subcategories: ['🏚️ homeless_shelters', '🏠 domestic_violence_shelters', '🧒 youth_shelters', '🐾 animal_shelters', '⚠️ disaster_shelters', '🏠 transitional_housing'] },
-'mutual_aid': { name: '🤲 Mutual Aid', icon: '🤲', color: '#ec4899', parent: 'nonprofit', subcategories: ['🌐 mutual_aid_networks', '🧊 community_fridges', '🆓 free_stores', '🔧 tool_libraries', '🌱 seed_libraries', '🌿 community_gardens'] },
+'mutual_aid': { name: '?? Mutual Aid', icon: '🤲', color: '#ec4899', parent: 'nonprofit', subcategories: ['🌐 mutual_aid_networks', '🧊 community_fridges', '🆓 free_stores', '🔧 tool_libraries', '🌱 seed_libraries', '🌿 community_gardens'] },
 'fundraising_campaigns': { name: '📢 Fundraising Campaigns', icon: '📢', color: '#f59e0b', parent: 'nonprofit', subcategories: ['🌐 crowdfunding', '💰 gofundme_style', '🎨 kickstarter_style', '👥 peer_to_peer', '🏛️ capital_campaigns', '📅 annual_appeals'] },
 'religious_services': { name: '⛪ Religious Services', icon: '⛪', color: '#8b5cf6', parent: 'nonprofit', subcategories: ['🙏 worship_services', '📖 religious_classes', '💬 faith_counseling', '💒 weddings_ceremonies', '⚰️ funerals_memorials', '💧 baptisms', '🏔️ religious_retreats'] },
 
@@ -37522,7 +37498,7 @@ var COUNTRY_CODES = [
     { code: '+63', country: 'Philippines', flag: '🇵🇭', maxLength: 10, placeholder: '912 345 6789' },
     { code: '+84', country: 'Vietnam', flag: '🇻🇳', maxLength: 9, placeholder: '91 234 5678' },
     { code: '+95', country: 'Myanmar', flag: '🇲🇲', maxLength: 9, placeholder: '91 234 5678' },
-    { code: '+880', country: 'Bangladesh', flag: '🇧🇩', maxLength: 10, placeholder: '1712 345678' },
+    { code: '+880', country: 'Bangladesh', flag: '🇧??', maxLength: 10, placeholder: '1712 345678' },
     { code: '+92', country: 'Pakistan', flag: '🇵🇰', maxLength: 10, placeholder: '312 345 6789' },
     { code: '+94', country: 'Sri Lanka', flag: '🇱🇰', maxLength: 9, placeholder: '71 234 5678' },
     { code: '+977', country: 'Nepal', flag: '🇳🇵', maxLength: 10, placeholder: '98 1234 5678' },
@@ -43329,7 +43305,7 @@ window.viewJobApplications = function(jobId) {
                 '📞 ' + escapeHtml(app.applicantPhone) + ' • ✉️ ' + escapeHtml(app.email || 'N/A') +
                 '</div>' +
                 '<div style="font-size:10px;color:#6b7280;margin-bottom:4px;">' +
-                '🎓 ' + escapeHtml(app.qualification || 'N/A') + ' • 📚 ' + escapeHtml(app.fieldOfStudy || 'N/A') +
+                '🎓 ' + escapeHtml(app.qualification || 'N/A') + ' • ?? ' + escapeHtml(app.fieldOfStudy || 'N/A') +
                 '</div>' +
                 '<div style="font-size:10px;color:#6b7280;margin-bottom:4px;">' +
                 '💼 ' + escapeHtml(app.yearsOfExperience || 'N/A') + ' experience • 🏢 ' + escapeHtml(app.currentEmployer || 'N/A') + ' • ' + escapeHtml(app.currentJobTitle || '') +
@@ -46550,7 +46526,7 @@ function renderSellerDashboard() {
         '<div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 24px; padding: 24px; margin-bottom: 20px; color: white;">' +
             '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">' +
                 '<div>' +
-                    '<h2 style="color: white; margin: 0; font-size: 20px;">👨‍🌾 ' + escapeHtml(currentUser.name || 'Seller') + '</h2>' +
+                    '<h2 style="color: white; margin: 0; font-size: 20px;">??‍🌾 ' + escapeHtml(currentUser.name || 'Seller') + '</h2>' +
                     '<p style="opacity: 0.7; margin: 4px 0 0 0; font-size: 13px;">' + escapeHtml(currentUser.phone) + '</p>' +
                 '</div>' +
                 '<button onclick="viewMyShop()" style="padding: 10px 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 25px; font-size: 12px; font-weight: 600; cursor: pointer;">🏪 View My Shop</button>' +
@@ -71895,7 +71871,7 @@ window.selectOtherPaymentMethod = function(index, orderId, amount) {
     var instructions = methodDetails.instructions || 'Send the exact amount to the ' + methodDetails.name + ' account above. Use Order ID as reference.';
     
     var modalContent = '<div style="padding: 20px;">' +
-        '<h3 style="color: #ec4899;">💳 Payment Instructions</h3>' +
+        '<h3 style="color: #ec4899;">?? Payment Instructions</h3>' +
         '<div style="background: #f0fdf4; padding: 16px; border-radius: 12px; margin: 16px 0;">' +
         '<div class="flex-row"><strong style="min-width: 120px;">Order ID:</strong><span>' + orderId + '</span></div>' +
         '<div class="flex-row"><strong style="min-width: 120px;">Amount:</strong><span style="color: #ec4899; font-size: 20px; font-weight: bold;">' + formatBWP(amount) + '</span></div>' +
