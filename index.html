@@ -16342,6 +16342,7 @@ function renderSellerShopScreen() {
                 '</div>' +
                 '<div style="padding:10px;">' +
                 '<div style="font-weight:600;font-size:14px;margin-bottom:2px;">' + escapeHtml(p.name) + '</div>' +
+                (p.rating > 0 ? '<div style="font-size:8px;color:#f59e0b;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings</div>' : '') +
                 (p.type === 'service' ? 
     '<div style="font-size:10px;color:#6b7280;margin-bottom:8px;">📍 ' + (dDisp ? dDisp + ' km' : 'TBD') + '</div>' :
     '<div style="font-size:10px;color:#6b7280;margin-bottom:8px;">📍 ' + (dDisp ? dDisp + ' km' : 'TBD') + ' • 🚚 ' + sDisp + '</div>'
@@ -20677,6 +20678,7 @@ function renderWishlistScreen() {
             // Product name
             '<div onclick="showProductDetails(\'' + p.id + '\')" style="cursor:pointer;">' +
             '<div style="font-weight:700;font-size:16px;margin-bottom:4px;line-height:1.3;">' + escapeHtml(p.name) + '</div>' +
+            (p.rating > 0 ? '<div style="font-size:8px;color:#f59e0b;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings </div>' : '') +
             '<div style="font-size:12px;color:#6b7280;margin-bottom:4px;">🏪 ' + escapeHtml(sellerMasked) + '</div>' +
             '<div style="font-size:12px;color:#9ca3af;margin-bottom:8px;">📍 ' + distDisplay + ' km away</div>' +
             '</div>' +
@@ -21310,6 +21312,7 @@ productsHtml += '<div onclick="showProductDetails(\'' + p.id + '\')" style="curs
     (mainImage ? '<img src="' + mainImage + '" style="width:100px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '<div style="width:100px;height:100px;background:#f3f4f6;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;">📷</div>') +
     '<div style="flex:1;min-width:0;">' +
     '<div style="font-weight:600;font-size:15px;margin-bottom:2px;">' + escapeHtml(p.name) + '</div>' +
+    (p.rating > 0 ? '<div style="font-size:10px;color:#f59e0b;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings (' + (p.reviewCount || 0) + ' reviews)</div>' : '') +
     (p.type === 'service' && p.booking && p.booking.enabled ? ' <span style="font-size:9px;background:#3b82f6;color:white;padding:2px 6px;border-radius:8px;">📅 Book</span>' : '') +
     (p.type === 'service' && p.serviceLocation ? '<div style="font-size:11px;color:#6b7280;margin-bottom:2px;">📍 ' + escapeHtml(p.serviceLocation.address) + '</div>' : '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;"><span style="font-size:11px;color:#9ca3af;">🏪 ' + escapeHtml(typeof maskSellerDisplay === 'function' ? maskSellerDisplay(p.sellerPhone, p.sellerName) : '••••Seller') + '</span>' + (typeof renderSellerBadge === 'function' ? renderSellerBadge(p.sellerPhone || p.sellerId || '') : '') + '</div>') +
     // ===== HOUSE RENTAL AMENITIES (LIST VIEW) =====
@@ -21356,7 +21359,8 @@ productsHtml += '<div class="product-card" onclick="showProductDetails(\'' + p.i
     '<div style="padding:10px;">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:2px;">' +
     '<span style="font-weight:600;font-size:14px;flex:1;line-height:1.2;">' + escapeHtml(p.name) + '</span>' +
-    '<button onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\');" style="background:none;border:none;font-size:16px;cursor:pointer;flex-shrink:0;">' + (isInWishlistFlag ? '❤️' : '🤍') + '</button>' +
+    (p.rating > 0 ? '<div style="font-size:9px;color:#f59e0b;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings (' + (p.reviewCount || 0) + ')</div>' : '') +
+'<button onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\');" style="background:none;border:none;font-size:16px;cursor:pointer;flex-shrink:0;">' + (isInWishlistFlag ? '❤️' : '🤍') + '</button>' +
     '</div>' +
     (p.type === 'service' && p.serviceLocation ? '<div style="font-size:11px;color:#6b7280;margin-bottom:2px;">📍 ' + escapeHtml(p.serviceLocation.address) + '</div>' : '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;"><span style="font-size:11px;color:#9ca3af;">🏪 ' + escapeHtml(typeof maskSellerDisplay === 'function' ? maskSellerDisplay(p.sellerPhone, p.sellerName) : '••••Seller') + '</span>' + (typeof renderSellerBadge === 'function' ? renderSellerBadge(p.sellerPhone || p.sellerId || '') : '') + '</div>') +
     // ===== HOUSE RENTAL AMENITIES (GRID VIEW) =====
@@ -30610,7 +30614,7 @@ const PRODUCT_CATEGORIES = {
 
 // ========== VENUE RENTALS ==========
 'venues': { name: '🏛️ Venues', icon: '🏛️', color: '#8b5cf6', subcategories: ['💒 wedding_venues', '🎉 party_venues', '🏢 corporate_venues', '📊 conference_venues', '🎵 concert_venues', '🏆 sports_venues', '🌳 outdoor_venues', '✨ unique_venues'] },
-'wedding_venues': { name: '💒 Wedding Venues', icon: '💒', color: '#ec4899', parent: 'venues', subcategories: ['⛪ church_weddings', '🌳 outdoor_weddings', '🏖️ beach_weddings', '🌸 garden_weddings', '🏛️ banquet_halls', '🏨 hotel_weddings', '🏚️ barn_weddings', '🍇 vineyard_weddings', '🏰 castle_weddings', '✈️ destination_weddings'] },
+'wedding_venues': { name: '💒 Wedding Venues', icon: '💒', color: '#ec4899', parent: 'venues', subcategories: ['⛪ church_weddings', '🌳 outdoor_weddings', '🏖️ beach_weddings', '🌸 garden_weddings', '🏛️ banquet_halls', '?? hotel_weddings', '🏚️ barn_weddings', '🍇 vineyard_weddings', '🏰 castle_weddings', '✈️ destination_weddings'] },
 'party_venues': { name: '🎉 Party Venues', icon: '🎉', color: '#f59e0b', parent: 'venues', subcategories: ['🎂 birthday_venues', '💍 anniversary_venues', '🎓 graduation_venues', '🍼 baby_shower_venues', '👰 bridal_shower_venues', '👪 reunion_venues', '🎄 holiday_party_venues', '🎧 club_venues'] },
 'corporate_venues': { name: '🏢 Corporate Venues', icon: '🏢', color: '#3b82f6', parent: 'venues', subcategories: ['📅 meeting_rooms', '📊 conference_rooms', '🛠️ training_rooms', '🏛️ boardrooms', '🏢 corporate_event_spaces', '🤝 team_building_venues', '🏔️ retreat_venues'] }, 
 // ========== ELECTRONICS ==========
@@ -30676,7 +30680,7 @@ const PRODUCT_CATEGORIES = {
 'legal_services': { name: '⚖️ Legal Services', icon: '⚖️', color: '#3b82f6', parent: 'services', subcategories: ['👨‍⚖️ lawyer_consultation', '📄 document_preparation', '🛂 immigration_services', '🏠 real_estate_law', '👪 family_law', '⚖️ criminal_defense', '🏢 business_law', '💡 intellectual_property', '📜 will_and_estate_planning'] },
 'financial_services': { name: '💰 Financial Services', icon: '💰', color: '#10b981', parent: 'services', subcategories: ['📊 accounting', '📋 tax_preparation', '📈 financial_planning', '💹 investment_advice', '🛡️ insurance_services', '🏦 loan_brokerage', '🏠 mortgage_services', '📈 credit_repair', '📚 bookkeeping'] },
 'it_services': { name: '💻 IT Services', icon: '💻', color: '#8b5cf6', parent: 'services', subcategories: ['🌐 web_development', '📱 app_development', '🎨 graphic_design', '📈 digital_marketing', '🔍 seo_services', '☁️ cloud_services', '🔒 cybersecurity', '💾 data_recovery', '🛠️ tech_support', '🌐 network_setup'] },
-'design_services': { name: '🎨 Design Services', icon: '🎨', color: '#ec4899', parent: 'services', subcategories: ['🏠 interior_design', '🎨 graphic_design', '🖌️ logo_design', '🌐 web_design', '👗 fashion_design', '🌿 landscape_design', '🏛️ architectural_design', '📦 product_design', '📦 packaging_design'] },
+'design_services': { name: '🎨 Design Services', icon: '🎨', color: '#ec4899', parent: 'services', subcategories: ['🏠 interior_design', '🎨 graphic_design', '🖌️ logo_design', '🌐 web_design', '👗 fashion_design', '🌿 landscape_design', '🏛️ architectural_design', '📦 product_design', '?? packaging_design'] },
 'moving_services': { name: '🚚 Moving Services', icon: '🚚', color: '#f59e0b', parent: 'services', subcategories: ['🏠 local_moving', '🛣️ long_distance_moving', '🏢 commercial_moving', '📦 packing_services', '🏠 storage_services', '🎹 piano_moving', '🚗 vehicle_shipping', '🚛 freight_services'] },
 'education_services': { name: '📚 Education Services', icon: '📚', color: '#10b981', parent: 'services', subcategories: ['📖 tutoring', '📝 test_prep', '🗣️ language_lessons', '🎵 music_lessons', '🎨 art_classes', '💃 dance_classes', '💪 fitness_classes', '💻 online_courses', '🛠️ workshops', '🎯 career_coaching'] },
 'consulting': { name: '💼 Consulting Services', icon: '💼', color: '#3b82f6', parent: 'services', subcategories: ['🏢 business_consulting', '📊 management_consulting', '📈 marketing_consulting', '👥 hr_consulting', '🎯 career_consulting', '🌟 life_coaching', '❤️ relationship_coaching', '🏠 real_estate_consulting'] },
@@ -37495,7 +37499,7 @@ var COUNTRY_CODES = [
     { code: '+66', country: 'Thailand', flag: '🇹🇭', maxLength: 9, placeholder: '81 234 5678' },
     { code: '+60', country: 'Malaysia', flag: '🇲🇾', maxLength: 9, placeholder: '12 345 6789' },
     { code: '+62', country: 'Indonesia', flag: '🇮🇩', maxLength: 11, placeholder: '812 3456 7890' },
-    { code: '+63', country: 'Philippines', flag: '🇵🇭', maxLength: 10, placeholder: '912 345 6789' },
+    { code: '+63', country: 'Philippines', flag: '🇵??', maxLength: 10, placeholder: '912 345 6789' },
     { code: '+84', country: 'Vietnam', flag: '🇻🇳', maxLength: 9, placeholder: '91 234 5678' },
     { code: '+95', country: 'Myanmar', flag: '🇲🇲', maxLength: 9, placeholder: '91 234 5678' },
     { code: '+880', country: 'Bangladesh', flag: '🇧??', maxLength: 10, placeholder: '1712 345678' },
@@ -39815,7 +39819,26 @@ if (orders.length > 50) orders = orders.slice(0, 50);
         }
         
         // Load from localStorage
-        try { var d = localStorage.getItem('bringmine_reviews'); if (d) reviews = JSON.parse(d); } catch(e) {}
+        // Load reviews from all users
+if (typeof reviews === 'undefined') reviews = [];
+var loadedReviewIds = {};
+for (var i = 0; i < reviews.length; i++) {
+    loadedReviewIds[reviews[i].id] = true;
+}
+for (var i = 0; i < users.length; i++) {
+    if (users[i].reviews && users[i].reviews.length > 0) {
+        for (var j = 0; j < users[i].reviews.length; j++) {
+            if (!loadedReviewIds[users[i].reviews[j].id]) {
+                reviews.push(users[i].reviews[j]);
+                loadedReviewIds[users[i].reviews[j].id] = true;
+            }
+        }
+    }
+}
+// Fallback to localStorage
+if (reviews.length === 0) {
+    try { var d = localStorage.getItem('bringmine_reviews'); if (d) reviews = JSON.parse(d); } catch(e) {}
+}
         try { var d = localStorage.getItem('bringmine_notifications'); if (d) notifications = JSON.parse(d); } catch(e) {}
         try { var d = localStorage.getItem('bringmine_payouts'); if (d) payouts = JSON.parse(d); } catch(e) {}
         try { var d = localStorage.getItem('bringmine_finance_data'); if (d) financeData = JSON.parse(d); } catch(e) {}
@@ -39860,7 +39883,24 @@ if (orders.length > 50) orders = orders.slice(0, 50);
                 }
             } catch(e) {}
         }
-        
+        // Recalculate product ratings from reviews
+        for (var i = 0; i < products.length; i++) {
+            var prod = products[i];
+            var prodReviews = [];
+            for (var j = 0; j < reviews.length; j++) {
+                if (reviews[j].productId === prod.id && reviews[j].status === 'approved') {
+                    prodReviews.push(reviews[j]);
+                }
+            }
+            if (prodReviews.length > 0) {
+                var sum = 0;
+                for (var j = 0; j < prodReviews.length; j++) {
+                    sum += prodReviews[j].rating;
+                }
+                prod.rating = Math.round((sum / prodReviews.length) * 10) / 10;
+                prod.reviewCount = prodReviews.length;
+            }
+        }
         console.log('✅ Loaded: ' + products.length + ' products, ' + users.length + ' users, ' + orders.length + ' orders');
     } catch(e) {
         console.error('Load error:', e);
@@ -43127,7 +43167,7 @@ function renderPendingJobApprovals() {
         var isPaid = job.pricePaid > 0;
         
         html += '<div style="background:#fef3c7;border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid #fde68a;">' +
-            '<div style="font-weight:600;font-size:14px;">💼 ' + escapeHtml(job.title) + '</div>' +
+            '<div style="font-weight:600;font-size:14px;">?? ' + escapeHtml(job.title) + '</div>' +
             '<div style="font-size:11px;color:#6b7280;">🏢 ' + escapeHtml(job.companyName) + ' • 📍 ' + escapeHtml(job.location) + '</div>' +
             '<div style="font-size:11px;color:#6b7280;">👤 ' + escapeHtml(job.employerName) + ' • ' + escapeHtml(job.employerId) + '</div>' +
             '<div style="font-size:11px;color:#6b7280;">📅 ' + job.expiryDays + ' days • ' + (job.featured ? '⭐ Sponsored' : '📋 Standard') + '</div>' +
@@ -52302,7 +52342,7 @@ html += '<button onclick="_knockOnGate(function(){ showBulkPhoneModal(); })" sty
     html += '<button onclick="manualCleanup()" style="padding:10px 16px;background:#fee2e2;color:#dc2626;border:none;border-radius:25px;cursor:pointer;font-size:11px;">🧹 Cleanup</button>';
     html += '<button class="pink-btn-outline" onclick="nuclearClearForTesting()" style="width:100%;margin-bottom:8px;background:#fee2e2;color:#ef4444;border-color:#fecaca;">🧪 Nuclear Clear (Testing Only)</button>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">';
-html += '<button class="pink-btn-outline" onclick="directorCleanupOrphanedImages()" style="padding:10px 16px;background:#f3e8ff;color:#6d28d9;border:1px solid #8b5cf6;border-radius:25px;cursor:pointer;font-size:11px;font-weight:600;">🖼️ Cleanup Orphaned Product Images</button>';
+html += '<button class="pink-btn-outline" onclick="directorCleanupOrphanedImages()" style="padding:10px 16px;background:#f3e8ff;color:#6d28d9;border:1px solid #8b5cf6;border-radius:25px;cursor:pointer;font-size:11px;font-weight:600;">??️ Cleanup Orphaned Product Images</button>';
 html += '<button onclick="directorClearOldAuditLogs()" style="padding:10px 16px;background:#f3f4f6;border:none;border-radius:25px;cursor:pointer;font-size:11px;">📋 Clear Old Audit Logs (30+ days)</button>';
 html += '<button onclick="directorClearOldNotifications()" style="padding:10px 16px;background:#fee2e2;color:#dc2626;border:none;border-radius:25px;cursor:pointer;font-size:11px;">🔔 Clear Old Notifications</button>';
 html += '</div>';
@@ -55245,6 +55285,7 @@ html += renderIdReminder();
                 '</div>' +
                 '<div style="padding:10px;">' +
                 '<div style="font-weight:600;font-size:13px;margin-bottom:2px;line-height:1.2;">' + escapeHtml(p.name.substring(0, 28)) + '</div>' +
+                (p.rating > 0 ? '<div style="font-size:8px;color:#f59e0b;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings</div>' : '') +
                 (p.type === 'service' && p.serviceLocation ? '<div style="font-size:10px;color:#6b7280;margin-bottom:4px;">📍 ' + escapeHtml(p.serviceLocation.address) + '</div>' : '<div style="font-size:10px;color:#9ca3af;margin-bottom:4px;">🏪 ' + escapeHtml(maskSeller(p.sellerPhone, p.sellerName)) + '</div>') +
                 '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:4px;">' +
                 (dInfo.hasDiscount ? '<span style="font-size:10px;color:#9ca3af;text-decoration:line-through;">' + formatBWP(dInfo.originalPrice) + '</span>' : '') +
@@ -55364,6 +55405,7 @@ featuredProducts[i]._promoDiscount = promo.discount || 0;
                         '</div>' +
                         '<div style="padding:8px 10px;flex:1;display:flex;flex-direction:column;">' +
                         '<div style="font-weight:600;font-size:12px;margin-bottom:2px;line-height:1.2;">' + escapeHtml(p.name.substring(0, 28)) + '</div>' +
+                        (p.rating > 0 ? '<div style="font-size:9px;color:#f59e0b;margin-bottom:2px;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings (' + (p.reviewCount || 0) + ')</div>' : '') +
                         (p.type === 'service' && p.serviceLocation ? '<div style="font-size:9px;color:#6b7280;margin-bottom:3px;">📍 ' + escapeHtml(p.serviceLocation.address) + '</div>' : '<div style="font-size:9px;color:#9ca3af;margin-bottom:3px;">🏪 ' + escapeHtml(sellerMasked) + '</div>') +
                         '<div style="display:flex;gap:3px;margin-bottom:3px;flex-wrap:wrap;">' +
                         '<span style="font-size:8px;background:#d1fae5;padding:1px 4px;border-radius:8px;color:#065f46;">📦' + soldCount + '</span>' +
@@ -55432,6 +55474,7 @@ var promoExpiresAt = p._promoExpiresAt || null;
                     '</div>' +
                     '<div style="flex:1;padding:16px;display:flex;flex-direction:column;justify-content:center;">' +
                     '<div style="font-weight:700;font-size:16px;margin-bottom:4px;color:#1f2937;line-height:1.3;padding-right:90px;">' + escapeHtml(p.name) + '</div>' +
+                    (p.rating > 0 ? '<div style="font-size:10px;color:#f59e0b;margin-bottom:4px;">' + (p.rating || 0).toFixed(1) + ' ⭐ Ratings (' + (p.reviewCount || 0) + ' reviews)</div>' : '') +
                     (p.type === 'service' && p.serviceLocation ? '<div style="font-size:12px;color:#6b7280;margin-bottom:6px;">📍 ' + escapeHtml(p.serviceLocation.address) + '</div>' : '<div style="font-size:12px;color:#9ca3af;margin-bottom:6px;">🏪 ' + escapeHtml(sellerMasked) + '</div>') +
                     '<div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">' +
                     '<span style="font-size:9px;background:#d1fae5;padding:2px 6px;border-radius:8px;color:#065f46;font-weight:600;">📦' + soldCount + ' sold</span>' +
@@ -56597,37 +56640,57 @@ html += '<div style="background:#f0f9ff;border:1px solid #bfdbfe;border-radius:1
     window._detailVarietyId = varietyId;
     window._detailVarietyLabel = varietyLabel;
     // ===== RELATED PRODUCTS =====
-    var relatedProducts = [];
-    for (var r = 0; r < products.length; r++) {
-        if (products[r].id !== product.id && 
-            products[r].mainCategory === product.mainCategory && 
-            products[r].approved && products[r].stock > 0 &&
-            products[r]._images && products[r]._images.length > 0) {
-            relatedProducts.push(products[r]);
-        }
+var relatedProducts = [];
+for (var r = 0; r < products.length; r++) {
+    if (products[r].id !== product.id && 
+        products[r].mainCategory === product.mainCategory && 
+        products[r].approved && products[r].stock > 0 &&
+        products[r]._images && products[r]._images.length > 0) {
+        relatedProducts.push(products[r]);
     }
-    relatedProducts = relatedProducts.slice(0, 6);
+}
+relatedProducts = relatedProducts.slice(0, 6);
+
+if (relatedProducts.length > 0) {
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #fbcfe8;">' +
+        '<div style="font-weight:700;font-size:16px;color:#1f2937;margin-bottom:10px;">📦 Similar Products</div>' +
+        '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;">';
     
-    if (relatedProducts.length > 0) {
-        html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #fbcfe8;">' +
-            '<div style="font-weight:700;font-size:16px;color:#1f2937;margin-bottom:10px;">📦 Similar Products</div>' +
-            '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;">';
+    for (var r = 0; r < relatedProducts.length; r++) {
+        var rp = relatedProducts[r];
+        var rpImg = getProductImages(rp.id);
+        var rpThumb = rp._images[0] || (rpImg && rpImg[0]) || '';
         
-        for (var r = 0; r < relatedProducts.length; r++) {
-            var rp = relatedProducts[r];
-            var rpImg = getProductImages(rp.id);
-            var rpThumb = (rpImg && rpImg.length > 0) ? rpImg[0] : rp._images[0];
-            
-            html += '<div onclick="closeCurrentModal();showProductDetails(\'' + rp.id + '\')" style="min-width:140px;background:white;border-radius:14px;overflow:hidden;border:1px solid #f3f4f6;cursor:pointer;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.05);">' +
-                '<img src="' + rpThumb + '" style="width:100%;height:110px;object-fit:cover;">' +
-                '<div style="padding:10px;">' +
-                '<div style="font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px;">' + escapeHtml(rp.name).substring(0, 30) + (rp.name.length > 30 ? '...' : '') + '</div>' +
-                '<div style="font-size:14px;font-weight:700;color:#ec4899;">' + formatBWP(rp.price) + '</div>' +
-                '<div style="font-size:10px;color:#6b7280;">per ' + (rp.unit || 'item') + '</div>' +
-                '</div></div>';
+        // Rating
+        var rpRating = rp.rating || 0;
+        var rpStars = '';
+        for (var rs = 1; rs <= 5; rs++) {
+            rpStars += rs <= Math.floor(rpRating) ? '⭐' : '☆';
         }
-        html += '</div></div>';
+        
+        // Distance
+        var rpDist = rp.distance || 0;
+        
+        // Seller
+        var rpSeller = rp.sellerPhone || '';
+        rpSeller = rpSeller.length >= 4 ? '••••' + rpSeller.slice(-4) : 'Seller';
+        
+        // Discount
+        var rpHasDiscount = rp.discountValue && rp.discountValue > 0;
+        
+        html += '<div onclick="closeCurrentModal();showProductDetails(\'' + rp.id + '\')" style="min-width:155px;background:white;border-radius:14px;overflow:hidden;border:1px solid #f3f4f6;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.06);position:relative;">' +
+            (rpHasDiscount ? '<div style="position:absolute;top:6px;left:6px;background:#ef4444;color:white;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;z-index:1;">-' + rp.discountValue + (rp.discountType === 'percentage' ? '%' : '') + '</div>' : '') +
+            '<img src="' + rpThumb + '" style="width:100%;height:115px;object-fit:cover;">' +
+            '<div style="padding:10px;">' +
+            '<div style="font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px;color:#1f2937;">' + escapeHtml(rp.name).substring(0, 32) + (rp.name.length > 32 ? '...' : '') + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;margin-bottom:4px;">🏪 ' + escapeHtml(rpSeller) + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;margin-bottom:4px;">' + rpStars + ' ' + (rpRating > 0 ? rpRating.toFixed(1) : 'New') + '</div>' +
+            '<div style="font-size:15px;font-weight:700;color:#ec4899;">' + formatBWP(rp.price) + '</div>' +
+            '<div style="font-size:10px;color:#6b7280;">per ' + (rp.unit || 'item') + ' • 📍 ' + (rpDist ? rpDist.toFixed(1) + 'km' : 'Nearby') + '</div>' +
+            '</div></div>';
     }
+    html += '</div></div>';
+}
     createModal({
         id: 'product_details_modal',
         title: '',
@@ -56736,7 +56799,7 @@ window.viewProductReviews = function(productId) {
     // Star display
     var avgStarsHtml = '';
     for (var s = 0; s < 5; s++) {
-        if (s < Math.floor(avgRating)) avgStarsHtml += '⭐';
+        if (s < Math.floor(avgRating)) avgStarsHtml += '⭐ Ratings';
         else avgStarsHtml += '☆';
     }
     
@@ -56777,7 +56840,7 @@ window.viewProductReviews = function(productId) {
         var review = productReviews[i];
         var reviewStars = '';
         for (var s = 0; s < 5; s++) {
-            if (s < (review.rating || 0)) reviewStars += '⭐';
+            if (s < (review.rating || 0)) reviewStars += '⭐ Ratings';
             else reviewStars += '☆';
         }
         
@@ -57121,7 +57184,7 @@ function renderStars(rating) {
     var emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     
     var stars = '';
-    for (var i = 0; i < fullStars; i++) stars += '⭐';
+    for (var i = 0; i < fullStars; i++) stars += '⭐ Ratings';
     if (hasHalfStar) stars += '½';
     for (var i = 0; i < emptyStars; i++) stars += '☆';
     
