@@ -1767,56 +1767,7 @@ window.addEventListener('load', function() {
         finishSplashScreen();
     }, 8000);
 });
-// ===== SOURCE CODE PROTECTION =====
-// Disable right-click
-// Disable right-click
-document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-// Block F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'F12') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.key === 's') { e.preventDefault(); return false; }
-});
-
-// Prevent loading in iframes
-if (window.top !== window.self) {
-    window.top.location = window.self.location;
-}
-// DevTools detection (safe - no debugger)
-var _devToolsOpen = false;
-setInterval(function() {
-    var widthDiff = window.outerWidth - window.innerWidth > 200;
-    var heightDiff = window.outerHeight - window.innerHeight > 200;
-    if ((widthDiff || heightDiff) && !_devToolsOpen) {
-        _devToolsOpen = true;
-        document.body.innerHTML = '<div style="text-align:center;padding:100px;font-family:sans-serif;background:white;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;">' +
-            '<h1>⚠️ Developer Tools Detected</h1>' +
-            '<p style="color:#6b7280;">Please close DevTools to use BRINGMINE.SHOP</p>' +
-            '<p style="color:#9ca3af;font-size:12px;">Refresh the page after closing.</p>' +
-            '</div>';
-    }
-    if (!widthDiff && !heightDiff) {
-        _devToolsOpen = false;
-    }
-}, 1500);
-// ===== PRODUCTION SECURITY =====
-if (window.location.hostname !== 'localhost') {
-    // Block Eruda
-    if (typeof eruda !== 'undefined') { eruda.destroy(); }
-    
-    // Clear console
-    setInterval(function() { console.clear(); }, 3000);
-    
-    // Disable text selection
-    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
-}
-
-// Basic bot detection
-if (/bot|crawler|spider|crawling/i.test(navigator.userAgent)) {
-    document.body.innerHTML = '<h1 style="text-align:center;padding:100px;">Access Denied</h1>';
-}
 var loginStep = 'role';
 var APP_STATE = { currentScreen: 'login' };
 let comparisonList = [];
@@ -30475,7 +30426,7 @@ const PRODUCT_CATEGORIES = {
 'dolls': { name: '🎎 Dolls', icon: '🎎', color: '#ec4899', parent: 'toys', subcategories: ['👗 barbie', '👶 baby_dolls', '👗 fashion_dolls', '🧸 rag_dolls', '👗 doll_clothes', '🏠 doll_houses', '👗 doll_accessories'] },
 'board_games': { name: '🎲 Board Games', icon: '🎲', color: '#10b981', parent: 'toys', subcategories: ['♟️ strategy_games', '🎉 party_games', '🃏 card_games', '👪 family_games', '♟️ chess', '🟥 checkers', '🎲 backgammon', '🎲 dice_games'] },
 'rc': { name: '🚁 RC Vehicles', icon: '🚁', color: '#f59e0b', parent: 'toys', subcategories: ['🏎️ rc_cars', '🚁 rc_drones', '🚤 rc_boats', '🚁 rc_helicopters', '✈️ rc_planes', '🔧 rc_parts', '🔋 rc_batteries', '🎮 rc_controllers'] },
-'plush': { name: '🧸 Plush Toys', icon: '🧸', color: '#ec4899', parent: 'toys', subcategories: ['🐻 stuffed_animals', '🧸 teddy_bears', '🛏️ pillow_pets', '🌀 squishmallows', '🎨 custom_plush', '🔑 keychain_plush'] },
+'plush': { name: '🧸 Plush Toys', icon: '🧸', color: '#ec4899', parent: 'toys', subcategories: ['🐻 stuffed_animals', '?? teddy_bears', '🛏️ pillow_pets', '🌀 squishmallows', '🎨 custom_plush', '🔑 keychain_plush'] },
 'building_toys': { name: '🧱 Building Toys', icon: '🧱', color: '#3b82f6', parent: 'toys', subcategories: ['🧱 lego', '🧲 magnetic_tiles', '🧱 building_blocks', '🔴 marble_runs', '🏗️ construction_sets'] },
 'educational_toys': { name: '📚 Educational Toys', icon: '📚', color: '#10b981', parent: 'toys', subcategories: ['🔬 stem_toys', '🧪 science_kits', '🔢 math_toys', '🔤 language_toys', '🌿 montessori', '🧩 puzzles_educational'] },
 'puzzles': { name: '🧩 Puzzles', icon: '🧩', color: '#f59e0b', parent: 'toys', subcategories: ['🧩 jigsaw_puzzles', '🎨 3d_puzzles', '🪵 wooden_puzzles', '🧩 floor_puzzles', '👨 adult_puzzles', '🧒 kids_puzzles'] },
@@ -30613,7 +30564,7 @@ const PRODUCT_CATEGORIES = {
 'pet_services': { name: '🐾 Pet Services', icon: '🐾', color: '#f59e0b', parent: 'services', subcategories: ['🐕 dog_walking', '🐈 pet_sitting', '✂️ pet_grooming', '🐕 pet_training', '🏥 veterinary_services', '🏠 pet_boarding', '🚗 pet_transportation', '📸 pet_photography'] },
 
 // ========== VENUE RENTALS ==========
-'venues': { name: '🏛️ Venues', icon: '🏛️', color: '#8b5cf6', subcategories: ['💒 wedding_venues', '🎉 party_venues', '🏢 corporate_venues', '📊 conference_venues', '🎵 concert_venues', '🏆 sports_venues', '🌳 outdoor_venues', '✨ unique_venues'] },
+'venues': { name: '🏛️ Venues', icon: '🏛️', color: '#8b5cf6', subcategories: ['💒 wedding_venues', '🎉 party_venues', '🏢 corporate_venues', '📊 conference_venues', '🎵 concert_venues', '?? sports_venues', '🌳 outdoor_venues', '✨ unique_venues'] },
 'wedding_venues': { name: '💒 Wedding Venues', icon: '💒', color: '#ec4899', parent: 'venues', subcategories: ['⛪ church_weddings', '🌳 outdoor_weddings', '🏖️ beach_weddings', '🌸 garden_weddings', '🏛️ banquet_halls', '?? hotel_weddings', '🏚️ barn_weddings', '🍇 vineyard_weddings', '🏰 castle_weddings', '✈️ destination_weddings'] },
 'party_venues': { name: '🎉 Party Venues', icon: '🎉', color: '#f59e0b', parent: 'venues', subcategories: ['🎂 birthday_venues', '💍 anniversary_venues', '🎓 graduation_venues', '🍼 baby_shower_venues', '👰 bridal_shower_venues', '👪 reunion_venues', '🎄 holiday_party_venues', '🎧 club_venues'] },
 'corporate_venues': { name: '🏢 Corporate Venues', icon: '🏢', color: '#3b82f6', parent: 'venues', subcategories: ['📅 meeting_rooms', '📊 conference_rooms', '🛠️ training_rooms', '🏛️ boardrooms', '🏢 corporate_event_spaces', '🤝 team_building_venues', '🏔️ retreat_venues'] }, 
@@ -52206,6 +52157,72 @@ window.showResourceMonitor = function() {
         width: '460px'
     });
 };
+window.runDirectorCleanup = async function() {
+    if (!currentUser || currentUser.role !== 'director') {
+        alert('Access denied. Director only.');
+        return;
+    }
+    
+    if (!confirm('🧹 Run system cleanup?\n\nThis will:\n• Remove corrupted products\n• Remove oversized/bulk entries\n• Remove empty orders\n• Remove invalid users\n\nNo real data will be lost.')) return;
+    
+    var cleaned = { products: 0, orders: 0, users: 0 };
+    
+    // Delete corrupted products from Supabase first
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        var allProds = await loadFromSupabase('products');
+        for (var i = 0; i < allProds.length; i++) {
+            var pdata = allProds[i].data || allProds[i];
+            var size = JSON.stringify(pdata).length;
+            if (allProds[i].id === 'bulk' || size > 500000 || !pdata.id || !pdata.name) {
+                await supabaseClient.from('products').delete().eq('id', allProds[i].id);
+                cleaned.products++;
+            }
+        }
+    }
+    
+    // Clean products in memory
+    var validProducts = [];
+    for (var i = 0; i < products.length; i++) {
+        if (products[i] && products[i].id && products[i].name && typeof products[i] === 'object' && products[i].id !== 'bulk') {
+            validProducts.push(products[i]);
+        }
+    }
+    products = validProducts;
+    
+    // Clean empty orders
+    var validOrders = [];
+    for (var i = 0; i < orders.length; i++) {
+        if (orders[i] && orders[i].id) validOrders.push(orders[i]);
+        else cleaned.orders++;
+    }
+    orders = validOrders;
+    
+    // Clean invalid users
+    var systemPhones = ['director_security', 'director_settings', 'system_documents'];
+    var validUsers = [];
+    for (var i = 0; i < users.length; i++) {
+        var u = users[i];
+        if (systemPhones.indexOf(u.phone) !== -1 || (u.phone && u.phone.length >= 8)) {
+            validUsers.push(u);
+        } else {
+            cleaned.users++;
+            if (typeof supabaseClient !== 'undefined' && supabaseClient && u.phone) {
+                try { await supabaseClient.from('users').delete().eq('phone', u.phone); } catch(e) {}
+            }
+        }
+    }
+    users = validUsers;
+    
+    // Clear caches
+    localStorage.removeItem('bringmine_products_backup');
+    localStorage.setItem('bringmine_products_backup', JSON.stringify(products));
+    
+    alert('✅ Cleanup complete!\n\n' +
+        '🗑️ Products cleaned: ' + cleaned.products + '\n' +
+        '🗑️ Empty orders: ' + cleaned.orders + '\n' +
+        '🗑️ Invalid users: ' + cleaned.users + '\n\n' +
+        'Refresh for full effect.');
+};
 function renderDirectorDashboard() {
     if (!currentUser || !isDirector(currentUser)) {
         showToast('Access denied. Director privileges required.', 'error');
@@ -52260,6 +52277,7 @@ function renderDirectorDashboard() {
     html += '</div>';
     html += '</div>';
     html += '</div>';
+    html += '<button onclick="runDirectorCleanup()" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;margin-bottom:8px;">🧹 System Cleanup</button>';
     html += '<button onclick="showResourceMonitor()" style="background:#f3f4f6;border:none;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;">📊 Resources</button>';
     // Stats Cards
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">';
@@ -56760,7 +56778,6 @@ window.viewProductReviews = function(productId) {
     
     if (!product) return;
     
-    // Get all approved reviews for this product
     var productReviews = [];
     if (typeof reviews !== 'undefined' && reviews) {
         for (var i = 0; i < reviews.length; i++) {
@@ -56789,31 +56806,27 @@ window.viewProductReviews = function(productId) {
         return;
     }
     
-    // Calculate average
     var totalRating = 0;
     for (var i = 0; i < productReviews.length; i++) {
         totalRating += (productReviews[i].rating || 0);
     }
     var avgRating = totalRating / productReviews.length;
     
-    // Star display
     var avgStarsHtml = '';
     for (var s = 0; s < 5; s++) {
-        if (s < Math.floor(avgRating)) avgStarsHtml += '⭐ Ratings';
+        if (s < Math.floor(avgRating)) avgStarsHtml += '⭐';
         else avgStarsHtml += '☆';
     }
     
     var reviewsHtml = '<div style="padding:12px;max-height:65vh;overflow-y:auto;">';
     
-    // Summary header
     reviewsHtml += '<div style="text-align:center;margin-bottom:16px;background:#fdf2f8;border-radius:14px;padding:18px;">';
     reviewsHtml += '<div style="font-size:40px;font-weight:800;color:#ec4899;">' + avgRating.toFixed(1) + '</div>';
     reviewsHtml += '<div style="font-size:18px;margin:4px 0;">' + avgStarsHtml + '</div>';
     reviewsHtml += '<div style="font-size:13px;color:#6b7280;">Based on ' + productReviews.length + ' review' + (productReviews.length !== 1 ? 's' : '') + '</div>';
     reviewsHtml += '</div>';
     
-    // Rating breakdown
-    var ratingCounts = [0, 0, 0, 0, 0]; // 5,4,3,2,1 stars
+    var ratingCounts = [0, 0, 0, 0, 0];
     for (var i = 0; i < productReviews.length; i++) {
         var r = Math.floor(productReviews[i].rating || 0);
         if (r >= 1 && r <= 5) ratingCounts[5 - r]++;
@@ -56834,19 +56847,20 @@ window.viewProductReviews = function(productId) {
     }
     reviewsHtml += '</div>';
     
-    // Individual reviews
     reviewsHtml += '<div style="border-top:1px solid #e5e7eb;padding-top:12px;">';
     for (var i = 0; i < productReviews.length; i++) {
         var review = productReviews[i];
         var reviewStars = '';
         for (var s = 0; s < 5; s++) {
-            if (s < (review.rating || 0)) reviewStars += '⭐ Ratings';
+            if (s < (review.rating || 0)) reviewStars += '⭐';
             else reviewStars += '☆';
         }
         
         reviewsHtml += '<div style="background:#f9fafb;border-radius:10px;padding:10px;margin-bottom:8px;">';
         reviewsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
-        reviewsHtml += '<span style="font-weight:600;font-size:13px;">' + escapeHtml(review.userName || 'Anonymous') + '</span>';
+        var reviewerName = review.userName || review.buyerName || 'Anonymous';
+if (reviewerName.length > 4) reviewerName = '••••' + reviewerName.slice(-4);
+reviewsHtml += '<span style="font-weight:600;font-size:13px;">' + escapeHtml(reviewerName) + '</span>';
         reviewsHtml += '<span style="font-size:11px;">' + reviewStars + '</span>';
         reviewsHtml += '</div>';
         
@@ -56854,14 +56868,14 @@ window.viewProductReviews = function(productId) {
             reviewsHtml += '<p style="font-size:12px;color:#4b5563;margin:0 0 4px 0;line-height:1.4;">' + escapeHtml(review.comment) + '</p>';
         }
         
-        if (review.createdAt) {
+        if (review.createdAt || review.timestamp) {
             try {
-                var d = new Date(review.createdAt);
+                var d = new Date(review.createdAt || review.timestamp);
                 var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
                 var dateStr = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
                 reviewsHtml += '<div style="font-size:10px;color:#9ca3af;">' + dateStr + '</div>';
             } catch(e) {
-                reviewsHtml += '<div style="font-size:10px;color:#9ca3af;">' + review.createdAt + '</div>';
+                reviewsHtml += '<div style="font-size:10px;color:#9ca3af;">' + (review.createdAt || '') + '</div>';
             }
         }
         
@@ -56873,7 +56887,7 @@ window.viewProductReviews = function(productId) {
     
     createModal({
         id: 'product_reviews_modal',
-        title: 'Reviews for ' + product.name,
+        title: '⭐ Reviews - ' + product.name,
         content: reviewsHtml,
         showCloseButton: true,
         closeOnOverlayClick: true,
