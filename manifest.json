@@ -1,15 +1,15 @@
 {
-    "name": "BRINGMINE.SHOP",
-    "short_name": "Bringmine",
-    "start_url": "https://www.bringmine.shop/",
-    "display": "standalone",
-    "background_color": "#ec4899",
-    "theme_color": "#ec4899",
-    "icons": [
-        {
-            "src": "android-chrome-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        }
-    ]
+  "name": "BRINGMINE.SHOP",
+  "short_name": "Bringmine",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ec4899",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
 }
