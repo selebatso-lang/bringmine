@@ -1,7 +1,7 @@
 {
     "name": "BRINGMINE.SHOP",
     "short_name": "Bringmine",
-    "start_url": "/?pwa=1",
+    "start_url": "https://www.bringmine.shop/",
     "display": "standalone",
     "background_color": "#ec4899",
     "theme_color": "#ec4899",
