@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Supabase Init - MUST load first -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>BRINGMINE• GLOBAL • MARKET</title>
+    
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         var SUPABASE_URL = 'https://fieijyaodnlaziqezkum.supabase.co';
         var SUPABASE_KEY = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
-        
         var IS_ONLINE = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         
         function initSupabase() {
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        supabaseClient = window.supabaseClient;
-        console.log('✅ Supabase connected');
-    } else {
-        setTimeout(initSupabase, 500);
-    }
-}
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                supabaseClient = window.supabaseClient;
+            } else { setTimeout(initSupabase, 500); }
+        }
+        initSupabase();
         
         window.saveToSupabase = async function(table, id, data) {
             if (typeof supabaseClient === 'undefined' || !supabaseClient) return;
@@ -28,50 +28,49 @@
                 else if (table === 'orders') { row.id = id; row.buyer_phone = data.buyerPhone || ''; row.seller_phone = data.sellerPhone || ''; }
                 else row.id = id;
                 await supabaseClient.from(table).upsert(row);
-            } catch(e) { console.error('Save error:', e); }
-        }
+            } catch(e) {}
+        };
         
         window.loadFromSupabase = async function(table) {
             if (typeof supabaseClient === 'undefined' || !supabaseClient) return [];
             try { var r = await supabaseClient.from(table).select('*'); return r.data || []; } catch(e) { return []; }
-        }
+        };
     </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <!-- Google Site Verification -->
-<meta name="google-site-verification" content="kCe6iHfggR-5z4m3dQhfJ4Kj-aRcubeUy7cnMBjjiJE">
-
-<!-- SEO Meta Tags -->
-<meta name="description" content="BRINGMINE.SHOP — Your Neighborhood Marketplace. Buy & sell products, book hotels, find jobs, hire couriers. Pay with Orange Money, MyZaka, Smega, Mobile Money, bank transfer, or crypto. Available across Botswana and worldwide.">
-<meta name="keywords" content="marketplace, Botswana, shop online, products, hotels, jobs, courier, buy, sell, Gaborone, Francistown, Africa, Orange Money, MyZaka, mobile money, crypto, online shopping, ecommerce">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.bringmine.shop/">
-
-<!-- Open Graph (Facebook, WhatsApp, social sharing) -->
-<meta property="og:title" content="BRINGMINE.SHOP - Your Neighborhood Marketplace">
-<meta property="og:description" content="Buy and sell products, book hotels, find jobs, hire couriers. Everything near you in Botswana.">
-<meta property="og:url" content="https://www.bringmine.shop/">
-<meta property="og:type" content="website">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
-<link rel="apple-touch-icon" href="android-chrome-192x192.png">
-    <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
-    <title>BRINGMINE• GLOBAL • MARKET</title>
-
-<!-- DNS prefetch for faster loading -->
-<link rel="dns-prefetch" href="https://api.bringmine.shop">
-<link rel="preconnect" href="https://api.bringmine.shop">
-<link rel="manifest" href="manifest.json">
-
-<!-- Netlify Blobs script (for production) -->
-<script>
-    // Auto-detect environment
-    var IS_PRODUCTION = window.location.hostname === 'www.bringmine.shop' || window.location.hostname === 'bringmine.shop';
-    var IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-</script>
+    
+    <!-- SEO -->
+    <meta name="google-site-verification" content="kCe6iHfggR-5z4m3dQhfJ4Kj-aRcubeUy7cnMBjjiJE">
+    <meta name="description" content="BRINGMINE.SHOP — Your Neighborhood Marketplace. Buy & sell products, book hotels, find jobs, hire couriers. Pay with Orange Money, MyZaka, Smega, Mobile Money, bank transfer, or crypto. Available across Botswana and worldwide.">
+    <meta name="keywords" content="marketplace, Botswana, shop online, products, hotels, jobs, courier, buy, sell, Gaborone, Francistown, Africa, Orange Money, MyZaka, mobile money, crypto, online shopping, ecommerce">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.bringmine.shop/">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="BRINGMINE.SHOP - Your Neighborhood Marketplace">
+    <meta property="og:description" content="Buy and sell products, book hotels, find jobs, hire couriers. Everything near you in Botswana.">
+    <meta property="og:url" content="https://www.bringmine.shop/">
+    <meta property="og:type" content="website">
+    
+    <!-- PWA -->
+    <meta name="theme-color" content="#ec4899">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bringmine">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="apple-touch-icon" href="android-chrome-192x192.png">
+    
+    <!-- DNS -->
+    <link rel="dns-prefetch" href="https://api.bringmine.shop">
+    <link rel="preconnect" href="https://api.bringmine.shop">
+    
+    <!-- Production check -->
+    <script>
+        var IS_PRODUCTION = window.location.hostname === 'www.bringmine.shop' || window.location.hostname === 'bringmine.shop';
+        var IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    </script>
 
 <style>
 /* ============================================================
@@ -30507,7 +30506,7 @@ const PRODUCT_CATEGORIES = {
 'automotive': { name: '🚗 Automotive', icon: '🚗', color: '#3b82f6', subcategories: ['🚗 cars', '🔧 auto_parts', '🚘 auto_accessories', '🔧 tools_auto', '🛞 tires_wheels', '🧼 car_care', '🏍️ motorcycle', '🚐 rv_parts', '⛵ boat_parts', '🏠 garage_equipment'] },
 'auto_parts': { name: '🔧 Auto Parts', icon: '🔧', color: '#8b5cf6', parent: 'automotive', subcategories: ['🔧 engines', '🔧 transmissions', '🛑 brakes', '🔧 suspension', '💨 exhaust', '⚡ alternators', '⚙️ starters', '💧 radiators', '🔧 filters', '⛓️ belts', '💧 hoses', '🔋 batteries_auto'] },
 'auto_accessories': { name: '🚘 Auto Accessories', icon: '🚘', color: '#ec4899', parent: 'automotive', subcategories: ['🚗 floor_mats', '🪑 seat_covers', '🚗 steering_wheel_covers', '🚘 car_covers', '📱 phone_mounts', '🌸 air_fresheners', '🏷️ decals', '🔧 car_parts', '🥤 cup_holders'] },
-'tools_auto': { name: '🔧 Auto Tools', icon: '🔧', color: '#f59e0b', parent: 'automotive', subcategories: ['🔧 wrenches', '🔧 sockets', '🔧 jacks', '🔧 stands', '📊 diagnostic_tools', '🔋 jump_starters', '🛞 tire_inflators', '🔧 oil_changers'] },
+'tools_auto': { name: '🔧 Auto Tools', icon: '🔧', color: '#f59e0b', parent: 'automotive', subcategories: ['🔧 wrenches', '🔧 sockets', '🔧 jacks', '🔧 stands', '📊 diagnostic_tools', '🔋 jump_starters', '?? tire_inflators', '🔧 oil_changers'] },
 'tires_wheels': { name: '🛞 Tires & Wheels', icon: '🛞', color: '#3b82f6', parent: 'automotive', subcategories: ['🛞 tires', '🛞 wheels', '🛞 rims', '🔘 hubcaps', '🔧 wheel_spacers', '🔩 lug_nuts', '⛓️ tire_chains'] },
 'car_care': { name: '🧼 Car Care', icon: '🧼', color: '#10b981', parent: 'automotive', subcategories: ['🧼 car_wash', '✨ wax', '✨ polish', '🧹 detailing_brushes', '🧵 microfiber_towels', '🧴 clay_bars', '🛡️ paint_protection'] },
 'motorcycle': { name: '🏍️ Motorcycle', icon: '🏍️', color: '#f59e0b', parent: 'automotive', subcategories: ['🔧 motorcycle_parts', '🪖 helmets', '🧤 gloves_moto', '🧥 jackets_moto', '👖 pants_moto', '👢 boots_moto', '🏍️ motorcycle_covers', '👜 saddlebags'] },
@@ -56446,6 +56445,8 @@ window.showProductDetails = async function(productId) {
         } catch(e) {}
     }
     
+   
+    
     if (typeof productImages === 'undefined') productImages = {};
     if ((!productImages[productId] || productImages[productId].length <= 1) && typeof supabaseClient !== 'undefined' && supabaseClient) {
         try {
@@ -56453,14 +56454,9 @@ window.showProductDetails = async function(productId) {
             if (imgResult.data && imgResult.data.data && imgResult.data.data.images) {
                 productImages[productId] = imgResult.data.data.images;
             }
-        } catch(e) {
-            if (product._images && product._images.length > 0) {
-                productImages[productId] = product._images;
-            }
-        }
+        } catch(e) {}
     }
-    
-    var productImages = getProductImages(product.id);
+    var displayImages = (productImages[productId] && productImages[productId].length > 0) ? productImages[productId] : getProductImages(product.id);
     
     // ===== VARIETY SETUP =====
     var hasVarieties = (product.hasVarieties || product.hasVariants) && 
@@ -56559,25 +56555,25 @@ window.showProductDetails = async function(productId) {
     var html = '';
     
     // Image section
-    if (productImages && productImages.length > 0) {
+    if (displayImages && displayImages.length > 0) {
         html += '<div style="position:relative;margin-bottom:10px;background:#f9fafb;border-radius:16px;overflow:hidden;">';
-        html += '<img src="' + productImages[0] + '" style="width:100%;height:220px;object-fit:contain;" id="mainProductImage">';
-        if (productImages.length > 1) {
+        html += '<img src="' + displayImages[0] + '" style="width:100%;height:220px;object-fit:contain;" id="mainProductImage">';
+        if (displayImages.length > 1) {
             html += '<button onclick="event.stopPropagation();navigateProductImage(-1);" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.9);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15);z-index:2;">‹</button>';
             html += '<button onclick="event.stopPropagation();navigateProductImage(1);" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.9);border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15);z-index:2;">›</button>';
-            html += '<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:white;padding:2px 10px;border-radius:12px;font-size:10px;" id="imageCounter">1/' + productImages.length + '</div>';
+            html += '<div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:white;padding:2px 10px;border-radius:12px;font-size:10px;" id="imageCounter">1/' + displayImages.length + '</div>';
         }
         if (hasDiscount) html += '<div style="position:absolute;top:8px;left:8px;background:#ef4444;color:#fff;padding:4px 10px;border-radius:15px;font-weight:700;font-size:12px;">-' + discountPercent + '% OFF</div>';
         if (hasVarieties) html += '<div style="position:absolute;top:8px;right:8px;background:#ec4899;color:#fff;padding:4px 10px;border-radius:15px;font-weight:700;font-size:11px;">' + varieties.length + ' varieties</div>';
         html += '</div>';
-        if (productImages.length > 1) {
+        if (displayImages.length > 1) {
             html += '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">';
-            for (var di = 0; di < productImages.length; di++) {
+            for (var di = 0; di < displayImages.length; di++) {
                 html += '<span onclick="event.stopPropagation();jumpToProductImage(' + di + ');" style="width:8px;height:8px;border-radius:50%;background:' + (di === 0 ? '#ec4899' : '#d1d5db') + ';cursor:pointer;display:inline-block;" id="dot_' + di + '"></span>';
             }
             html += '</div>';
         }
-        window._currentProductImages = productImages;
+        window._currentProductImages = displayImages;
         window._currentImageIndex = 0;
     } else {
         html += '<div style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:16px;padding:50px;text-align:center;margin-bottom:10px;"><span style="font-size:60px;">📦</span></div>';
@@ -56797,6 +56793,8 @@ if (relatedProducts.length > 0) {
         width: '480px'
     });
 };
+
+
 window.navigateProductImage = function(direction) {
     var images = window._currentProductImages;
     if (!images || images.length <= 1) return;
