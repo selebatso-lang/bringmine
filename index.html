@@ -1767,7 +1767,56 @@ window.addEventListener('load', function() {
         finishSplashScreen();
     }, 8000);
 });
+// ===== SOURCE CODE PROTECTION =====
+// Disable right-click
+// Disable right-click
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
+// Block F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); return false; }
+});
+
+// Prevent loading in iframes
+if (window.top !== window.self) {
+    window.top.location = window.self.location;
+}
+// DevTools detection (safe - no debugger)
+var _devToolsOpen = false;
+setInterval(function() {
+    var widthDiff = window.outerWidth - window.innerWidth > 200;
+    var heightDiff = window.outerHeight - window.innerHeight > 200;
+    if ((widthDiff || heightDiff) && !_devToolsOpen) {
+        _devToolsOpen = true;
+        document.body.innerHTML = '<div style="text-align:center;padding:100px;font-family:sans-serif;background:white;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;">' +
+            '<h1>⚠️ Developer Tools Detected</h1>' +
+            '<p style="color:#6b7280;">Please close DevTools to use BRINGMINE.SHOP</p>' +
+            '<p style="color:#9ca3af;font-size:12px;">Refresh the page after closing.</p>' +
+            '</div>';
+    }
+    if (!widthDiff && !heightDiff) {
+        _devToolsOpen = false;
+    }
+}, 1500);
+// ===== PRODUCTION SECURITY =====
+if (window.location.hostname !== 'localhost') {
+    // Block Eruda
+    if (typeof eruda !== 'undefined') { eruda.destroy(); }
+    
+    // Clear console
+    setInterval(function() { console.clear(); }, 3000);
+    
+    // Disable text selection
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+}
+
+// Basic bot detection
+if (/bot|crawler|spider|crawling/i.test(navigator.userAgent)) {
+    document.body.innerHTML = '<h1 style="text-align:center;padding:100px;">Access Denied</h1>';
+}
 var loginStep = 'role';
 var APP_STATE = { currentScreen: 'login' };
 let comparisonList = [];
@@ -25777,15 +25826,19 @@ if (bookingType === 'date_range') {
     // Add to products
     products.push(newProduct);
 
-// Save images to Supabase FIRST
-// Store images INSIDE the product data
-// Create thumbnails for listing screens
-// Create ONLY ONE thumbnail for listing screens (first image only)
-var firstThumb = await createThumbnail(tempProductImages[0]);
-newProduct._images = [firstThumb]; // Only 1 thumbnail (~4KB) in product
+    // Create ONLY ONE thumbnail for listing screens (first image only)
+    var firstThumb = await createThumbnail(tempProductImages[0]);
+    newProduct._images = [firstThumb];
 
-// Keep all full images separate
-productImages[newProduct.id] = [...tempProductImages]; // Full images in memory
+    // Keep all full images in memory for current session
+    productImages[newProduct.id] = [...tempProductImages];
+    
+    // Save full images to Supabase so they survive refresh
+    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        try {
+            await saveToSupabase('products', newProduct.id + '_fullimg', { images: tempProductImages });
+        } catch(e) {}
+    }
 
 // Save directly to Supabase (bypass failing saveAllData)
 if (typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -30519,7 +30572,7 @@ const PRODUCT_CATEGORIES = {
 'grains': { name: '🌾 Grains', icon: '🌾', color: '#f59e0b', isFresh: true, subcategories: ['🍚 rice', '🌾 wheat', '🌾 oats', '🌾 quinoa', '🌾 barley', '🌽 corn', '🌾 millet', '🌾 buckwheat', '🏛️ ancient_grains', '🌾 sorghum', '🌽 maize', '🌾 rye', '🌾 spelt', '🌾 teff', '🌾 amaranth', '🌾 farro', '🌾 freekeh', '🌾 wild_rice', '🌾 triticale', '🌾 fonio', '🌾 khorasan_wheat', '🌾 emmer', '🌾 einkorn', '🌾 jobs_tears', '🌾 canary_seed'] },
 'groceries': { name: '🏪 Groceries', icon: '🏪', color: '#8b5cf6', isFresh: false, subcategories: ['🥫 canned_goods', '🍝 pasta_types', '🥫 sauces_types', '🍯 oils_typed', '🌶️ spices_dried_herbs', '🍰 baking_supplies', '🍿 snacks_chips', '🍪 bread_types', '🍬 candy_types', '🥜 grain_types', '🥜 butters', '🍯 jams_honey', '🥣 grocery_combos', '🥣 broths_stocks', '☕ coffee_tea', '🧃 juices_drinks', '💧 water_soda', '🥣 breakfast_cereals', '🍫 granola_bars', '🍰 rice_cakes', '🌾 flour_meal', '🍬 sugar_sweeteners', '🧂 salt_pepper', '🍞 breadcrumbs', '🥖 croutons', '🥒 pickles_olives', '🫑 salsa_dips', '🍅 mustard_ketchup', '🥗 mayo_dressing', '🍶 soy_sauce', '🌶️ hot_sauce', '🍶 worcestershire', '🍖 barbecue_sauce', '🍶 teriyaki_glaze', '🌿 pesto', '🫘 hummus', '🥜 tahini', '🍶 vinegars', '🫒 cooking_oils', '💨 cooking_sprays', '🎨 food_coloring', '✨ sprinkles', '🍫 baking_chips', '🍫 cocoa_powder', '🍰 cake_mixes', '🍰 frosting', '🥧 pie_fillings', '🍇 dried_fruits', '🌿 dried_seaweed', '🍜 instant_noodles', '🍜 ramen', '🌾 couscous', '🌽 polenta', '🌮 tortillas', '🫓 flatbread', '?? pita', '🥯 bagels', '🥯 english_muffins'] },
 'toiletry': { name: '🧴 Toiletry', icon: '🧴', color: '#ec4898', isFresh: false, subcategories: ['🧴 toiletry_combos', '🧴 shampoo', '🧴 conditioner', '🧴 body_wash', '🧼 soap', '🧴 lotion', '🦵 deodorant', '🪥 toothpaste', '🪥 toothbrush', '🪥 floss', '💧 mouthwash', '🪒 razor', '🪒 shaving_cream', '🌸 feminine_hygiene', '👶 diapers', '🧴 baby_wipes', '🧻 tissue', '🧻 toilet_paper', '🧻 paper_towels', '🤧 kleenex', '⚪ cotton_balls', '🪢 cotton_swabs', '🧴 makeup_remover', '🧼 facial_cleanser', '🧴 moisturizer', '☀️ sunscreen', '💄 lip_balm', '🧴 hand_sanitizer', '🩹 first_aid', '🩹 bandages', '🧴 antiseptic', '🎀 hair_ties', '🪮 brush_comb', '💨 hair_spray', '?? hair_gel', '🧴 dry_shampoo', '🪢 q_tips', '✂️ nail_clipper', '✂️ tweezers', '💄 makeup', '💄 foundation', '👁️ mascara', '💄 lipstick', '💅 nail_polish', '🌸 perfume', '🧴 cologne', '🛁 bath_salts', '🧽 loofah', '🧴 shower_cap', '👂 earplugs', '😴 sleep_mask'] },
-'drinks': { name: '🥤 Drinks', icon: '🥤', color: '#3b82f6', isFresh: false, subcategories: ['🥤 coke', '🍊 fanta_orange', '🥤 sprite', '🥤 coke_zero', '🍇 fanta_grape', '🥤 dr_pepper', '🥤 pepsi', '🥤 mountain_dew', '🥤 creme_soda', '🥤 iron_brew', '🥤 ginger_ale', '🥤 root_beer', '🥤 sarsaparilla', '💧 sparkling_water', '💧 tonic_water', '💧 seltzer', '⚡ energy_drinks', '🏃 sports_drinks', '🥣 mahewu', '🥣 amahewu', '🥣 munkoyo', '🥤 ginger_beer', '🌸 hibiscus_tea', '🍃 rooibos_tea', '🍃 honeybush_tea', '🌳 baobab_juice', '🍈 marula_juice', '🍊 monkey_orange_juice', '🍈 tamarind_drink', '🌾 sorghum_beer_non_alcoholic', '🫚 ginger_ale_african_style', '🍋 lemon_ginger_blast', '🌿 moringa_tea', '🌳 baobab_powder_drink', '🥥 coconut_water', '💧 bottled_water', '🥛 flavored_milk', '🍫 chocolate_milk', '🍓 strawberry_milk', '🥤 milkshakes', '🥣 horlicks', '🥣 nestum', '🥣 ovaltine', '🧃 bottled_juice', '🍊 orange_juice', '🍎 apple_juice', '🍇 grape_juice', '🍍 pineapple_juice', '🥭 mango_juice', '🥭 passion_juice', '🍈 guava_juice', '🍊 mixed_fruit_juice', '🍅 vegetable_juice', '🍅 tomato_juice', '🥕 carrot_juice', '🧊 ice_tea', '🍋 lemonade', '🍋 limeade', '🍊 fruit_punch', '🥤 smoothies', '🍄 kombucha', '🥛 fermented_milk_drink', '🥛 buttermilk', '🥛 lassi', '🥛 yogurt_drink'] },
+'drinks': { name: '🥤 Drinks', icon: '🥤', color: '#3b82f6', isFresh: false, subcategories: ['🥤 coke', '🍊 fanta_orange', '🥤 sprite', '🥤 coke_zero', '🍇 fanta_grape', '🥤 dr_pepper', '🥤 pepsi', '🥤 mountain_dew', '🥤 creme_soda', '🥤 iron_brew', '🥤 ginger_ale', '🥤 root_beer', '🥤 sarsaparilla', '💧 sparkling_water', '💧 tonic_water', '💧 seltzer', '⚡ energy_drinks', '🏃 sports_drinks', '🥣 mahewu', '🥣 amahewu', '🥣 munkoyo', '🥤 ginger_beer', '🌸 hibiscus_tea', '🍃 rooibos_tea', '🍃 honeybush_tea', '🌳 baobab_juice', '🍈 marula_juice', '🍊 monkey_orange_juice', '🍈 tamarind_drink', '🌾 sorghum_beer_non_alcoholic', '🫚 ginger_ale_african_style', '🍋 lemon_ginger_blast', '🌿 moringa_tea', '🌳 baobab_powder_drink', '🥥 coconut_water', '💧 bottled_water', '🥛 flavored_milk', '🍫 chocolate_milk', '🍓 strawberry_milk', '🥤 milkshakes', '🥣 horlicks', '🥣 nestum', '🥣 ovaltine', '🧃 bottled_juice', '🍊 orange_juice', '🍎 apple_juice', '🍇 grape_juice', '🍍 pineapple_juice', '🥭 mango_juice', '?? passion_juice', '🍈 guava_juice', '🍊 mixed_fruit_juice', '🍅 vegetable_juice', '🍅 tomato_juice', '🥕 carrot_juice', '🧊 ice_tea', '🍋 lemonade', '🍋 limeade', '🍊 fruit_punch', '🥤 smoothies', '🍄 kombucha', '🥛 fermented_milk_drink', '🥛 buttermilk', '🥛 lassi', '🥛 yogurt_drink'] },
 'alcohol': { name: '🍺 Alcohol', icon: '🍺', color: '#facc15', isFresh: false, subcategories: ['🍺 umqombothi', '🍺 chibuku', '🌾 traditional_sorghum_beer', '🍺 ginger', '🍷 isundu_palm_wine', '🍺 mukumbi', '🍺 kanyanga', '🌳 bark_beer', '🥣 mahewu_fermented', '🍌 banana_beer', '🥛 milkwine', '🍑 mampoer', '🍑 witblits', '🍈 marula_beer', '🍦 morula_cream', '🍦 amarula_cream_liqueur', '🍊 van_der_hum', '🍇 cape_velvet', '🍫 cremora_liqueur', '🍷 south_african_wine', '🍷 pinotage', '🍷 chenin_blanc', '🍷 sauvignon_blanc', '🍷 cabernet_sauvignon', '🍷 merlot', '🍷 shiraz', '🍷 chardonnay', '🍾 cap_classique', '🍾 methode_cap_classique', '🍷 dessert_wine', '🍷 hanepoot', '🍷 constantia_wine', '🍺 beer', '🍺 castle_lager', '🍺 carling_black_label', '🍺 windhoek_lager', '🍺 hansa', '?? sab_miller', '🍺 castle_light', '🐟 flying_fish', '🍺 amstel', '🍺 heineken', '🍺 corona', '🍺 stella_artois', '🍺 craft_beer', '🍺 darling_brew', '🍺 jack_black', '🍺 devils_peak', '🍺 woodstock_brewery', '🍺 cider', '🍺 savanna_dry', '🍺 hunters_dry', '🍎 apple_cider', '🍐 pear_cider', '🌸 rose_cider', '🍸 gin', '🍸 inverroche', '🍸 hope_on_hop_off', '🌿 botanist_gin', '🌍 african_gin', '🌿 wild_africa_gin', '🍸 vodka', '🍸 crusader_vodka', '🐻 russian_bear', '🍸 smirnoff', '🍸 absolute', '🥃 whiskey', '🥃 bains_whisky', '⛵ three_ships', '🥃 jameson', '🥃 johnnie_walker', '🥃 jack_daniels', '🥃 rum', '🍸 bacardi', '🏴‍☠️ captain_morgan', '🐙 kraken', '🥃 tequila', '🍸 jose_cuervo', '🍹 patron', '🥃 brandy', '🍸 klipdrift', '🍸 richelieu', '🍸 van_ryn', '🍸 olof_bergh', '🍹 liqueurs', '🐘 amarula', '🍸 springbokkie', '🍨 dompedro', '🍸 southern_comfort', '🍸 baileys', '🌿 jägermeister', '🌿 fernet_branca', '🍷 vermouth', '🍷 port', '🍷 sherry', '🍾 sparkling_wine', '🍾 champagne', '🍾 prosecco', '🍾 cava', '🍐 mampoer_pear', '🍑 mampoer_apricot', '🍈 mampoer_marula', '🍚 rice_ale', '🍖 seswaa_ale'] },
 'restaurants': { name: '🍽️ Restaurants', icon: '🍽️', color: '#f97316', isFresh: false, subcategories: ['🍔 fast_food', '🍔 burgers', '🍕 pizza', '🍗 fried_chicken', '🐟 fish_and_chips', '🥪 sandwich_shops', '🍲 tswana_foods', '🍝 pasta_places', '🌮 mexican_grill', '🌮 taco_bell', '🥡 chinese_takeout', '🍣 japanese_sushi', '🥩 korean_bbq', '🍜 thai_cuisine', '🍜 vietnamese_pho', '🍛 indian_curry', '🍚 biryani_houses', '🍝 italian_ristorante', '🥖 french_bistro', '🥙 greek_taverna', '🥗 mediterranean_cafe', '🍢 lebanese_grill', '🍲 moroccan_cuisine', '🫓 ethiopian_injera', '🍛 nigerian_jollof', '🍲 ghanaian_fufu', '🥩 south_african_braai', '🔥 shisa_nyama', '🍗 local_chicken_inn', '🐔 nandos', '🥩 steers', '🍕 debonairs_pizza', '🍕 romans_pizza', '🐟 captain_dores', '🍤 ocean_basket', '🍗 kfc', '🍔 mcdonalds', '🍔 burger_king', '🍳 wimpy', '🥩 spur_steak_ranch', '🍔 rocomamas', '☕ mugg_and_bean', '🍝 panarottis', '🍔 johnny_rockets', '🍗 texas_chicken', '🐟 fishaways', '🍽️ southern_sun_restaurants', '🌭 hotdog_stands', '🚚 food_trucks', '🍽️ fine_dining', '🍽️ buffet_restaurants', '👪 family_restaurants', '☕ coffee_shops', '🥐 bakery_cafes', '🍳 brunch_spots', '🏙️ rooftop_dining', '🦞 seafood_restaurants', '🥩 steakhouses', '🌱 vegan_restaurants', '🥗 vegetarian_cafe', '🚫 gluten_free_options', '🕌 halal_restaurants', '✡️ kosher_eateries', '🍳 all_day_breakfast', '🥞 pancake_houses', '🍦 ice_cream_parlors', '🍰 dessert_cafes'] },
 'hotels': { name: '🏨 Hotels', icon: '🏨', color: '#ef4444', isFresh: false, subcategories: ['👑 luxury_hotels', '🏨 boutique_hotels', '💼 business_hotels', '✈️ airport_hotels', '🏖️ resorts', '💆 spa_hotels', '🎰 casino_hotels', '📊 conference_hotels', '💍 wedding_venues', '🏖️ beach_resorts', '🌿 bush_lodges', '🦁 safari_lodges', '🦒 game_reserves', '⛰️ mountain_lodges', '🏞️ lake_resorts', '🌿 eco_lodges', '🎒 backpackers_hostels', '🛏️ bed_and_breakfast', '🏠 guesthouses', '🍳 self_catering', '🏢 apartment_hotels', '🛎️ serviced_apartments', '📆 extended_stay', '💰 budget_hotels', '🛣️ motels', '🏡 inns', '🏕️ campsites', '🏕️ glamping', '🌳 treehouse_stays', '🚜 farm_stays', '🍇 vineyard_estates', '🏙️ city_hotels', '🏛️ heritage_hotels', '📜 historic_hotels', '☀️ sun_international', '🌍 tsogo_sun', '🏨 city_lodge', '🏘️ town_lodge', '🛣️ road_lodge', '☀️ southern_sun', '🌿 protea_hotels', '🏨 marriott', '🏨 hilton', '🏨 hyatt', '🏨 radisson_blu', '🏨 westin', '🏨 sheraton', '🏨 intercontinental', '🏨 holiday_inn', '🏨 premier_hotel', '🌿 garden_court', '🏨 the_maslow', '🎨 da_vinci_hotel', '🏨 the_pearl', '✨ one_and_only', '🏔️ belmond_mount_nelson', '🏛️ cape_grace', '🌿 the_ozon', '👑 royal_malewane', '🌿 sabi_sabi', '🦁 londolozi', '✨ singita', '🦏 ulusaba', '🦁 mala_mala', '🍃 four_seasons', '🏔️ the_westcliff', '🏛️ michelangelo_hotel'] },
@@ -30736,7 +30789,7 @@ const PRODUCT_CATEGORIES = {
 'nonprofit': { name: '🤝 Non-Profit & Community', icon: '🤝', color: '#10b981', subcategories: ['🎁 charity_donations', '🙋 volunteer_opportunities', '🎪 community_events', '🥫 food_banks', '🏠 shelters', '🤲 mutual_aid', '📢 fundraising_campaigns', '⛪ religious_services'] },
 'charity_donations': { name: '🎁 Charity Donations', icon: '🎁', color: '#ec4899', parent: 'nonprofit', subcategories: ['💰 cash_donations', '📦 goods_donations', '🚗 vehicle_donations', '📅 monthly_giving', '🕯️ memorial_donations', '🏢 corporate_giving'] },
 'volunteer_opportunities': { name: '🙋 Volunteer Opportunities', icon: '🙋', color: '#3b82f6', parent: 'nonprofit', subcategories: ['🎪 one_time_volunteer', '🔄 ongoing_volunteer', '💻 virtual_volunteer', '🏢 corporate_volunteer', '🧒 youth_volunteer', '?? senior_volunteer'] },
-'community_events': { name: '🎪 Community Events', icon: '🎪', color: '#f59e0b', parent: 'nonprofit', subcategories: ['🎭 parades', '🛒 farmers_markets', '🧹 community_cleanups', '🎉 block_parties', '🏃 charity_runs', '🥫 food_drives', '🧥 coat_drives'] },
+'community_events': { name: '🎪 Community Events', icon: '??', color: '#f59e0b', parent: 'nonprofit', subcategories: ['🎭 parades', '🛒 farmers_markets', '🧹 community_cleanups', '🎉 block_parties', '🏃 charity_runs', '🥫 food_drives', '🧥 coat_drives'] },
 'food_banks': { name: '🥫 Food Banks', icon: '🥫', color: '#10b981', parent: 'nonprofit', subcategories: ['🥫 food_pantries', '🍲 meal_programs', '🥣 soup_kitchens', '🚚 food_distribution', '🎒 weekend_backpacks', '👴 senior_meal_delivery'] },
 'shelters': { name: '🏠 Shelters', icon: '🏠', color: '#8b5cf6', parent: 'nonprofit', subcategories: ['🏚️ homeless_shelters', '🏠 domestic_violence_shelters', '🧒 youth_shelters', '🐾 animal_shelters', '⚠️ disaster_shelters', '🏠 transitional_housing'] },
 'mutual_aid': { name: '?? Mutual Aid', icon: '🤲', color: '#ec4899', parent: 'nonprofit', subcategories: ['🌐 mutual_aid_networks', '🧊 community_fridges', '🆓 free_stores', '🔧 tool_libraries', '🌱 seed_libraries', '🌿 community_gardens'] },
@@ -56371,7 +56424,7 @@ function formatTimeAgo(date) {
     return Math.floor(diff / 86400) + 'd ago';
 }
 
-window.showProductDetails = function(productId) {
+window.showProductDetails = async function(productId) {
     var product = null;
     for (var i = 0; i < products.length; i++) {
         if (products[i].id === productId) {
@@ -56381,6 +56434,31 @@ window.showProductDetails = function(productId) {
     }
     
     if (!product) { alert('Product not found'); return; }
+    
+       // Load full images from Supabase if not in memory
+    if (typeof productImages === 'undefined') productImages = {};
+    if ((!productImages[productId] || productImages[productId].length <= 1) && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        try {
+            var imgResult = await supabaseClient.from('products').select('data').eq('id', productId + '_fullimg').single();
+            if (imgResult.data && imgResult.data.data && imgResult.data.data.images) {
+                productImages[productId] = imgResult.data.data.images;
+            }
+        } catch(e) {}
+    }
+    
+    if (typeof productImages === 'undefined') productImages = {};
+    if ((!productImages[productId] || productImages[productId].length <= 1) && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        try {
+            var imgResult = await supabaseClient.from('products').select('data').eq('id', productId + '_fullimg').single();
+            if (imgResult.data && imgResult.data.data && imgResult.data.data.images) {
+                productImages[productId] = imgResult.data.data.images;
+            }
+        } catch(e) {
+            if (product._images && product._images.length > 0) {
+                productImages[productId] = product._images;
+            }
+        }
+    }
     
     var productImages = getProductImages(product.id);
     
