@@ -52,10 +52,7 @@
     
     <!-- PWA -->
     <meta name="theme-color" content="#ec4899">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bringmine">
-    <link rel="manifest" href="manifest.json">
+    
     
     <!-- Icons -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -1679,9 +1676,7 @@ select.seller-input {
     <style>@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>
 </div>
 <script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-}
+
 // ==============================================
 // SPLASH SCREEN CONTROLLER
 // ==============================================
@@ -20748,7 +20743,7 @@ function renderWishlistScreen() {
         '</div>' +
         
         summaryHtml +
-        
+        '<button onclick="shareWishlist()" style="width:100%;padding:14px;background:#25D366;color:white;border:none;border-radius:25px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;">💬 Share Wishlist on WhatsApp</button>' +
         // Products grid
         '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">' + productsHtml + '</div>' +
         
@@ -21289,7 +21284,7 @@ var mainImage = (pImages && pImages.length > 0) ? pImages[0] : (p._cachedImage |
         var isInComparison = typeof comparisonList !== 'undefined' && comparisonList ? (comparisonList.indexOf(p.id) !== -1) : false;
         
         // ===== SHARE URL =====
-        var shareUrl = 'https://bringmine.shop/product/' + p.id;
+        var shareUrl = 'https://www.bringmine.shop/';
         var shareText = encodeURIComponent('Check out ' + p.name + ' on BringMine!');
         
         var stockBg = '#f3f4f6';
@@ -21418,75 +21413,78 @@ productsHtml += '<div class="product-card" onclick="showProductDetails(\'' + p.i
     
     return currencyNote + jobsSectionHtml + productsSectionLabel + '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;">' + productsHtml + '</div>';
 }
-function shareProduct(productId, productName) {
-    var shareUrl = 'https://bringmine.shop/product/' + productId;
-    var shareText = 'Check out ' + productName + ' on BringMine!';
+window.shareProduct = function(productId, productName) {
+    var url = 'https://www.bringmine.shop/';
+    var text = '🛍️ ' + productName + ' on BRINGMINE.SHOP — ' + url;
     
-    // Try Web Share API first (works on mobile)
+    // Try native share first (works on mobile Chrome, Safari, Samsung Internet)
     if (navigator.share) {
         navigator.share({
             title: productName,
-            text: shareText,
-            url: shareUrl
-        }).catch(function(err) {
-            console.log('Share failed:', err);
-            fallbackShare(shareUrl, shareText);
+            text: text,
+            url: url
+        }).catch(function() {
+            // If share fails, fall through to manual options
+            showShareOptions(text, url);
         });
-    } else {
-        fallbackShare(shareUrl, shareText);
+        return;
     }
-}
+    
+    // Desktop or fallback
+    showShareOptions(text, url);
+};
 
-function fallbackShare(shareUrl, shareText) {
-    var shareOptions = '<div style="padding:20px;text-align:center;">' +
-        '<h3 style="margin-bottom:16px;">📤 Share Product</h3>' +
-        '<div style="display:flex;flex-direction:column;gap:10px;">' +
-        '<button onclick="window.open(\'https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + shareUrl) + '\', \'_blank\');closeCurrentModal();" style="padding:12px;background:#25D366;color:white;border:none;border-radius:12px;font-size:14px;cursor:pointer;">💬 WhatsApp</button>' +
-        '<button onclick="window.open(\'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl) + '\', \'_blank\');closeCurrentModal();" style="padding:12px;background:#1877F2;color:white;border:none;border-radius:12px;font-size:14px;cursor:pointer;">📘 Facebook</button>' +
-        '<button onclick="window.open(\'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(shareUrl) + '\', \'_blank\');closeCurrentModal();" style="padding:12px;background:#1DA1F2;color:white;border:none;border-radius:12px;font-size:14px;cursor:pointer;">🐦 Twitter/X</button>' +
-        '<button onclick="copyToClipboard(\'' + shareUrl + '\');closeCurrentModal();" style="padding:12px;background:#6b7280;color:white;border:none;border-radius:12px;font-size:14px;cursor:pointer;">📋 Copy Link</button>' +
-        '</div>' +
+function showShareOptions(text, url) {
+    var waLink = 'https://wa.me/?text=' + encodeURIComponent(text);
+    var fbLink = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    
+    var content = '<div style="text-align:center;padding:10px;">' +
+        '<h4 style="margin-bottom:12px;">📤 Share via</h4>' +
+        '<a href="' + waLink + '" target="_blank" style="display:block;padding:12px;background:#25D366;color:white;border-radius:25px;text-decoration:none;margin-bottom:8px;font-weight:600;">💬 WhatsApp</a>' +
+        '<a href="' + fbLink + '" target="_blank" style="display:block;padding:12px;background:#1877F2;color:white;border-radius:25px;text-decoration:none;margin-bottom:8px;font-weight:600;">📘 Facebook</a>' +
+        '<button onclick="navigator.clipboard.writeText(\'' + text.replace(/'/g, "\\'") + '\');closeCurrentModal();alert(\'✅ Copied!\');" style="width:100%;padding:12px;background:#6b7280;color:white;border:none;border-radius:25px;font-weight:600;cursor:pointer;">📋 Copy Link</button>' +
+        '<button onclick="closeCurrentModal()" style="width:100%;padding:8px;background:none;border:none;color:#9ca3af;margin-top:8px;cursor:pointer;">Cancel</button>' +
         '</div>';
     
-    if (typeof createModal === 'function') {
-        createModal({
-            id: 'shareProduct',
-            title: 'Share Product',
-            content: shareOptions,
-            showCloseButton: true,
-            closeOnOverlayClick: true,
-            showFooter: false,
-            width: '350px'
-        });
-    }
+    createModal({
+        id: 'share_modal',
+        title: '📤 Share',
+        content: content,
+        showCloseButton: true,
+        closeOnOverlayClick: true,
+        showFooter: false,
+        width: '340px'
+    });
 }
-
-function copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function() {
-            if (typeof showToast === 'function') {
-                showToast('✅ Link copied to clipboard!', 'success');
-            } else {
-                alert('Link copied!');
-            }
-        });
+// Share wishlist
+window.shareWishlist = function() {
+    var wishlistProducts = getUserWishlistProducts();
+    if (wishlistProducts.length === 0) {
+        alert('Your wishlist is empty');
+        return;
+    }
+    
+    var url = 'https://www.bringmine.shop/';
+    var shareText = '❤️ My Wishlist on BRINGMINE.SHOP\n\n';
+    for (var i = 0; i < Math.min(wishlistProducts.length, 5); i++) {
+        shareText += '• ' + wishlistProducts[i].name + ' — ' + formatBWP(calculateBulkDiscount(wishlistProducts[i], 1)) + '\n';
+    }
+    if (wishlistProducts.length > 5) {
+        shareText += '...and ' + (wishlistProducts.length - 5) + ' more\n';
+    }
+    shareText += '\n🛒 Shop now: ' + url;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Wishlist',
+            text: shareText,
+            url: url
+        }).catch(function() {});
     } else {
-        // Fallback
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        if (typeof showToast === 'function') {
-            showToast('✅ Link copied to clipboard!', 'success');
-        } else {
-            alert('Link copied!');
-        }
+        var waLink = 'https://wa.me/?text=' + encodeURIComponent(shareText);
+        window.open(waLink, '_blank');
     }
-}
+};
 function renderProductCard(product) {
     // Check if product is in wishlist using your existing function
     var wishlist = currentUser ? getUserWishlist() : [];
@@ -30572,7 +30570,7 @@ const PRODUCT_CATEGORIES = {
 'birds': { name: '🐔 Birds', icon: '🐔', color: '#ef4444', isAlive: true, subcategories: ['🐓 farm_chicken', '🐔 broiler', '🐓 layer', '🐣 broilerchick', '🐣 layerchick', '🦢 geese', '🪿 duck', '🐦 birdkinds'] },
 'dairy': { name: '🥛 Dairy', icon: '🥛', color: '#f3f4f6', isFresh: true, subcategories: ['🥛 milk', '🧀 cheese', '🥣 yogurt', '🧈 butter', '🥛 cream', '🥚 eggs', '🌱 plant_based_dairy'] },
 'grains': { name: '🌾 Grains', icon: '🌾', color: '#f59e0b', isFresh: true, subcategories: ['🍚 rice', '🌾 wheat', '🌾 oats', '🌾 quinoa', '🌾 barley', '🌽 corn', '🌾 millet', '🌾 buckwheat', '🏛️ ancient_grains', '🌾 sorghum', '🌽 maize', '🌾 rye', '🌾 spelt', '🌾 teff', '🌾 amaranth', '🌾 farro', '🌾 freekeh', '🌾 wild_rice', '🌾 triticale', '🌾 fonio', '🌾 khorasan_wheat', '🌾 emmer', '🌾 einkorn', '🌾 jobs_tears', '🌾 canary_seed'] },
-'groceries': { name: '🏪 Groceries', icon: '🏪', color: '#8b5cf6', isFresh: false, subcategories: ['🥫 canned_goods', '🍝 pasta_types', '🥫 sauces_types', '🍯 oils_typed', '🌶️ spices_dried_herbs', '🍰 baking_supplies', '🍿 snacks_chips', '🍪 bread_types', '🍬 candy_types', '🥜 grain_types', '🥜 butters', '🍯 jams_honey', '🥣 grocery_combos', '🥣 broths_stocks', '☕ coffee_tea', '🧃 juices_drinks', '💧 water_soda', '🥣 breakfast_cereals', '🍫 granola_bars', '🍰 rice_cakes', '🌾 flour_meal', '🍬 sugar_sweeteners', '🧂 salt_pepper', '🍞 breadcrumbs', '🥖 croutons', '🥒 pickles_olives', '🫑 salsa_dips', '🍅 mustard_ketchup', '🥗 mayo_dressing', '🍶 soy_sauce', '🌶️ hot_sauce', '🍶 worcestershire', '🍖 barbecue_sauce', '🍶 teriyaki_glaze', '🌿 pesto', '🫘 hummus', '🥜 tahini', '🍶 vinegars', '🫒 cooking_oils', '💨 cooking_sprays', '🎨 food_coloring', '✨ sprinkles', '🍫 baking_chips', '🍫 cocoa_powder', '🍰 cake_mixes', '🍰 frosting', '🥧 pie_fillings', '🍇 dried_fruits', '🌿 dried_seaweed', '🍜 instant_noodles', '🍜 ramen', '🌾 couscous', '🌽 polenta', '🌮 tortillas', '🫓 flatbread', '?? pita', '🥯 bagels', '🥯 english_muffins'] },
+'groceries': { name: '🏪 Groceries', icon: '🏪', color: '#8b5cf6', isFresh: false, subcategories: ['🥫 canned_goods', '🍝 pasta_types', '🥫 sauces_types', '🍯 oils_typed', '🌶️ spices_dried_herbs', '🍰 baking_supplies', '🍿 snacks_chips', '🍪 bread_types', '🍬 candy_types', '🥜 grain_types', '🥜 butters', '🍯 jams_honey', '🥣 grocery_combos', '🥣 broths_stocks', '☕ coffee_tea', '🧃 juices_drinks', '💧 water_soda', '🥣 breakfast_cereals', '🍫 granola_bars', '🍰 rice_cakes', '🌾 flour_meal', '🍬 sugar_sweeteners', '🧂 salt_pepper', '🍞 breadcrumbs', '🥖 croutons', '🥒 pickles_olives', '🫑 salsa_dips', '🍅 mustard_ketchup', '🥗 mayo_dressing', '🍶 soy_sauce', '🌶️ hot_sauce', '🍶 worcestershire', '🍖 barbecue_sauce', '🍶 teriyaki_glaze', '🌿 pesto', '🫘 hummus', '🥜 tahini', '🍶 vinegars', '🫒 cooking_oils', '💨 cooking_sprays', '🎨 food_coloring', '✨ sprinkles', '🍫 baking_chips', '?? cocoa_powder', '🍰 cake_mixes', '🍰 frosting', '🥧 pie_fillings', '🍇 dried_fruits', '🌿 dried_seaweed', '🍜 instant_noodles', '🍜 ramen', '🌾 couscous', '🌽 polenta', '🌮 tortillas', '🫓 flatbread', '?? pita', '🥯 bagels', '🥯 english_muffins'] },
 'toiletry': { name: '🧴 Toiletry', icon: '🧴', color: '#ec4898', isFresh: false, subcategories: ['🧴 toiletry_combos', '🧴 shampoo', '🧴 conditioner', '🧴 body_wash', '🧼 soap', '🧴 lotion', '🦵 deodorant', '🪥 toothpaste', '🪥 toothbrush', '🪥 floss', '💧 mouthwash', '🪒 razor', '🪒 shaving_cream', '🌸 feminine_hygiene', '👶 diapers', '🧴 baby_wipes', '🧻 tissue', '🧻 toilet_paper', '🧻 paper_towels', '🤧 kleenex', '⚪ cotton_balls', '🪢 cotton_swabs', '🧴 makeup_remover', '🧼 facial_cleanser', '🧴 moisturizer', '☀️ sunscreen', '💄 lip_balm', '🧴 hand_sanitizer', '🩹 first_aid', '🩹 bandages', '🧴 antiseptic', '🎀 hair_ties', '🪮 brush_comb', '💨 hair_spray', '?? hair_gel', '🧴 dry_shampoo', '🪢 q_tips', '✂️ nail_clipper', '✂️ tweezers', '💄 makeup', '💄 foundation', '👁️ mascara', '💄 lipstick', '💅 nail_polish', '🌸 perfume', '🧴 cologne', '🛁 bath_salts', '🧽 loofah', '🧴 shower_cap', '👂 earplugs', '😴 sleep_mask'] },
 'drinks': { name: '🥤 Drinks', icon: '🥤', color: '#3b82f6', isFresh: false, subcategories: ['🥤 coke', '🍊 fanta_orange', '🥤 sprite', '🥤 coke_zero', '🍇 fanta_grape', '🥤 dr_pepper', '🥤 pepsi', '🥤 mountain_dew', '🥤 creme_soda', '🥤 iron_brew', '🥤 ginger_ale', '🥤 root_beer', '🥤 sarsaparilla', '💧 sparkling_water', '💧 tonic_water', '💧 seltzer', '⚡ energy_drinks', '🏃 sports_drinks', '🥣 mahewu', '🥣 amahewu', '🥣 munkoyo', '🥤 ginger_beer', '🌸 hibiscus_tea', '🍃 rooibos_tea', '🍃 honeybush_tea', '🌳 baobab_juice', '🍈 marula_juice', '🍊 monkey_orange_juice', '🍈 tamarind_drink', '🌾 sorghum_beer_non_alcoholic', '🫚 ginger_ale_african_style', '🍋 lemon_ginger_blast', '🌿 moringa_tea', '🌳 baobab_powder_drink', '🥥 coconut_water', '💧 bottled_water', '🥛 flavored_milk', '🍫 chocolate_milk', '🍓 strawberry_milk', '🥤 milkshakes', '🥣 horlicks', '🥣 nestum', '🥣 ovaltine', '🧃 bottled_juice', '🍊 orange_juice', '🍎 apple_juice', '🍇 grape_juice', '🍍 pineapple_juice', '🥭 mango_juice', '?? passion_juice', '🍈 guava_juice', '🍊 mixed_fruit_juice', '🍅 vegetable_juice', '🍅 tomato_juice', '🥕 carrot_juice', '🧊 ice_tea', '🍋 lemonade', '🍋 limeade', '🍊 fruit_punch', '🥤 smoothies', '🍄 kombucha', '🥛 fermented_milk_drink', '🥛 buttermilk', '🥛 lassi', '🥛 yogurt_drink'] },
 'alcohol': { name: '🍺 Alcohol', icon: '🍺', color: '#facc15', isFresh: false, subcategories: ['🍺 umqombothi', '🍺 chibuku', '🌾 traditional_sorghum_beer', '🍺 ginger', '🍷 isundu_palm_wine', '🍺 mukumbi', '🍺 kanyanga', '🌳 bark_beer', '🥣 mahewu_fermented', '🍌 banana_beer', '🥛 milkwine', '🍑 mampoer', '🍑 witblits', '🍈 marula_beer', '🍦 morula_cream', '🍦 amarula_cream_liqueur', '🍊 van_der_hum', '🍇 cape_velvet', '🍫 cremora_liqueur', '🍷 south_african_wine', '🍷 pinotage', '🍷 chenin_blanc', '🍷 sauvignon_blanc', '🍷 cabernet_sauvignon', '🍷 merlot', '🍷 shiraz', '🍷 chardonnay', '🍾 cap_classique', '🍾 methode_cap_classique', '🍷 dessert_wine', '🍷 hanepoot', '🍷 constantia_wine', '🍺 beer', '🍺 castle_lager', '🍺 carling_black_label', '🍺 windhoek_lager', '🍺 hansa', '?? sab_miller', '🍺 castle_light', '🐟 flying_fish', '🍺 amstel', '🍺 heineken', '🍺 corona', '🍺 stella_artois', '🍺 craft_beer', '🍺 darling_brew', '🍺 jack_black', '🍺 devils_peak', '🍺 woodstock_brewery', '🍺 cider', '🍺 savanna_dry', '🍺 hunters_dry', '🍎 apple_cider', '🍐 pear_cider', '🌸 rose_cider', '🍸 gin', '🍸 inverroche', '🍸 hope_on_hop_off', '🌿 botanist_gin', '🌍 african_gin', '🌿 wild_africa_gin', '🍸 vodka', '🍸 crusader_vodka', '🐻 russian_bear', '🍸 smirnoff', '🍸 absolute', '🥃 whiskey', '🥃 bains_whisky', '⛵ three_ships', '🥃 jameson', '🥃 johnnie_walker', '🥃 jack_daniels', '🥃 rum', '🍸 bacardi', '🏴‍☠️ captain_morgan', '🐙 kraken', '🥃 tequila', '🍸 jose_cuervo', '🍹 patron', '🥃 brandy', '🍸 klipdrift', '🍸 richelieu', '🍸 van_ryn', '🍸 olof_bergh', '🍹 liqueurs', '🐘 amarula', '🍸 springbokkie', '🍨 dompedro', '🍸 southern_comfort', '🍸 baileys', '🌿 jägermeister', '🌿 fernet_branca', '🍷 vermouth', '🍷 port', '🍷 sherry', '🍾 sparkling_wine', '🍾 champagne', '🍾 prosecco', '🍾 cava', '🍐 mampoer_pear', '🍑 mampoer_apricot', '🍈 mampoer_marula', '🍚 rice_ale', '🍖 seswaa_ale'] },
@@ -30676,7 +30674,7 @@ const PRODUCT_CATEGORIES = {
 'residential': { name: '🏘️ Residential Properties', icon: '🏘️', color: '#3b82f6', parent: 'real_estate', subcategories: ['🏠 houses', '🏢 condos', '🏢 apartments', '🏘️ townhouses', '🏘️ duplexes', '🏛️ villas', '🏰 mansions', '🪵 cabins', '🏡 cottages', '🏠 tiny_homes', '🚐 mobile_homes', '🏗️ modular_homes'] },
 'commercial': { name: '🏢 Commercial Property', icon: '🏢', color: '#8b5cf6', parent: 'real_estate', subcategories: ['🏢 office_spaces', '🛍️ retail_spaces', '📦 warehouses', '🏭 industrial_buildings', '🛍️ shopping_centers', '🏨 hotels', '🍽️ restaurants_commercial', '⛽ gas_stations', '🛍️ strip_malls', '🏥 medical_offices'] },
 'rentals': { name: '🔑 Rentals & Leasing', icon: '🔑', color: '#f59e0b', parent: 'real_estate', subcategories: ['🏢 apartment_rentals', '🏠 house_rentals', '🏢 commercial_rentals', '🏖️ vacation_rentals', '🛏️ room_rentals', '🏢 office_rentals', '📦 warehouse_rentals', '🎨 studio_rentals', '📅 short_term_rentals', '📆 long_term_rentals', '📋 sublets', '🏢 property_management'] },
-'storage_units': { name: '📦 Storage Units', icon: '📦', color: '#8b5cf6', parent: 'real_estate', subcategories: ['🔒 self_storage', '🌡️ climate_controlled', '🚗 vehicle_storage', '⛵ boat_storage', '🚐 rv_storage', '🏢 commercial_storage', '📦 warehouse_space'] },
+'storage_units': { name: '📦 Storage Units', icon: '📦', color: '#8b5cf6', parent: 'real_estate', subcategories: ['🔒 self_storage', '🌡️ climate_controlled', '🚗 vehicle_storage', '⛵ boat_storage', '🚐 rv_storage', '🏢 commercial_storage', '?? warehouse_space'] },
 'parking_spaces': { name: '🅿️ Parking Spaces', icon: '🅿️', color: '#3b82f6', parent: 'real_estate', subcategories: ['🏠 garage_parking', '🚗 driveway_parking', '🅿️ lot_parking', '📌 reserved_parking', '⚡ ev_charging_parking', '📆 monthly_parking', '📅 daily_parking'] },
 'timeshare_resales': { name: '🔄 Timeshare Resales', icon: '🔄', color: '#f59e0b', parent: 'real_estate', subcategories: ['⭐ timeshare_points', '📅 timeshare_weeks', '🏖️ timeshare_rentals', '📋 timeshare_transfers'] },
 'real_estate_development': { name: '🏗️ Real Estate Development', icon: '🏗️', color: '#f59e0b', parent: 'real_estate', subcategories: ['📐 subdivision_development', '🏢 mixed_use_development', '🏘️ master_planned_communities', '🏭 brownfield_redevelopment', '🏗️ infill_development'] },
@@ -30710,10 +30708,10 @@ const PRODUCT_CATEGORIES = {
 'tent_rentals_expanded': { name: '⛺ Tent Rentals', icon: '⛺', color: '#f59e0b', parent: 'event_services_expanded', subcategories: ['💍 wedding_tents', '🎉 party_tents', '🏢 commercial_tents', '🎪 pop_up_tents', '🖼️ frame_tents', '🏕️ pole_tents', '🔧 tent_accessories'] },
 'sound_system_rentals': { name: '🔊 Sound System Rentals', icon: '🔊', color: '#8b5cf6', parent: 'event_services_expanded', subcategories: ['🔊 pa_systems', '🔊 speaker_rentals', '🎤 microphone_rentals', '🎛️ mixer_rentals', '🎧 monitor_rentals', '🔊 subwoofer_rentals'] },
 'inflatable_rentals': { name: '🎈 Inflatable Rentals', icon: '🎈', color: '#ec4899', parent: 'event_services_expanded', subcategories: ['🏰 bounce_houses', '💧 water_slides', '🏃 obstacle_courses', '🎮 interactive_games', '⚽ inflatable_sports', '🎈 combos_inflatables'] },
-'event_transportation': { name: '🚌 Event Transportation', icon: '🚌', color: '#3b82f6', parent: 'event_services_expanded', subcategories: ['🎉 party_buses', '🚐 shuttle_services_event', '🚐 limousine_event', '🚋 trolley_rentals', '🚌 school_bus_rentals', '🚌 charter_buses'] }, 
+'event_transportation': { name: '🚌 Event Transportation', icon: '🚌', color: '#3b82f6', parent: 'event_services_expanded', subcategories: ['?? party_buses', '🚐 shuttle_services_event', '🚐 limousine_event', '🚋 trolley_rentals', '🚌 school_bus_rentals', '🚌 charter_buses'] }, 
 
 // ========== HOME & LIVING ==========
-'home': { name: '🏠 Home', icon: '🏠', color: '#f59e0b', subcategories: ['🛋️ furniture', '🎨 decor', '🍳 kitchen', '💡 lighting', '📦 storage', '🛏️ bedding', '🚿 bath', '🧹 cleaning', '🧺 laundry', '🔨 home_improvement', '🛡️ safety', '🐾 pet_home'] },
+'home': { name: '🏠 Home', icon: '🏠', color: '#f59e0b', subcategories: ['🛋️ furniture', '🎨 decor', '🍳 kitchen', '💡 lighting', '📦 storage', '🛏️ bedding', '🚿 bath', '🧹 cleaning', '🧺 laundry', '🔨 home_improvement', '??️ safety', '🐾 pet_home'] },
 'furniture': { name: '🛋️ Furniture', icon: '🛋️', color: '#8b5cf6', parent: 'home', subcategories: ['🛋️ sofas', '🪑 chairs', '🪵 tables', '🛏️ beds', '🗄️ dressers', '🪑 nightstands', '🖥️ desks', '📚 bookshelves', '🗄️ cabinets', '🌳 outdoor_furniture', '💺 office_chairs', '🛋️ recliners', '🫘 bean_bags'] },
 'decor': { name: '🎨 Home Decor', icon: '🎨', color: '#ec4899', parent: 'home', subcategories: ['🖼️ wall_art', '⏰ clocks', '🏺 vases', '🕯️ candles', '🖼️ frames', '🪞 mirrors', '🗿 figurines', '🛋️ throw_pillows', '🚪 curtains', '?? rugs', '🖼️ tapestries', '🏷️ decals', '🌿 artificial_plants'] },
 'kitchen': { name: '🍳 Kitchen', icon: '🍳', color: '#10b981', parent: 'home', subcategories: ['🍳 cookware', '🥧 bakeware', '🔪 cutlery', '🥄 utensils', '🔧 gadgets', '⚡ appliances', '📦 storage_containers', '💧 water_bottles', '🍱 lunch_boxes', '☕ coffee_makers', '🌀 blenders', '🍟 air_fryers', '🍲 slow_cookers', '🔥 microwaves'] },
@@ -30838,7 +30836,7 @@ const PRODUCT_CATEGORIES = {
 'bricklayers': { name: '🧱 Bricklayers', icon: '🧱', color: '#f97316', parent: 'construction', subcategories: ['🧱 brick_laying', '🧱 block_laying', '🪨 stone_masonry', '?? retaining_walls', '🏗️ foundations', '🏠 chimney_building', '🌿 garden_walls', '🧱 boundary_walls', '🏛️ pillars', '🏛️ archways', '🔧 brick_repair', '🔧 tuckpointing', '🔧 brick_repointing', '🏢 bricklaying_contractors', '🏠 residential_bricklaying', '🏢 commercial_bricklaying', '🏭 industrial_bricklaying'] },
 'carpenters': { name: '🪚 Carpenters', icon: '🪚', color: '#eab308', parent: 'construction', subcategories: ['🏗️ framing', '🏠 roofing_carpentry', '🪵 floor_installation', '🚪 cabinet_making', '🪑 furniture_making', '🚪 door_installation', '🪟 window_installation', '🪵 deck_building', '🏠 porch_building', '🚧 fence_installation', '🪚 custom_woodwork', '🪚 trim_carpentry', '🪵 baseboards', '🏛️ crown_molding', '🔧 wood_repair', '🪑 furniture_restoration', '🧱 formwork_carpentry', '🧱 concrete_formwork', '🎭 stage_carpentry', '🎬 set_building'] },
 'electricians': { name: '⚡ Electricians', icon: '⚡', color: '#facc15', parent: 'construction', subcategories: ['🔌 wiring_installation', '💡 lighting_installation', '🌀 ceiling_fans', '⚡ circuit_breakers', '📊 electrical_panels', '🔋 generator_installation', '⚡ inverter_installation', '☀️ solar_panel_installation', '🔒 security_lighting', '⚠️ emergency_lighting', '🔄 rewiring_services', '🔧 electrical_repairs', '🔍 fault_finding', '🔍 electrical_inspections', '📄 certificate_of_compliance', '🏠 home_automation', '🏠 smart_home_wiring', '🔌 data_cabling', '📹 cctv_installation', '🚨 alarm_systems', '⚡ electric_fencing', '🏊 pool_wiring', '🏭 industrial_electricians', '🏢 commercial_electricians', '🏠 residential_electricians'] },
-'plumbers': { name: '🔧 Plumbers', icon: '🔧', color: '#3b82f6', parent: 'construction', subcategories: ['🔧 pipe_installation', '💧 leak_repairs', '🚰 tap_installation', '🚽 toilet_installation', '🚿 shower_installation', '🛁 bath_installation', '🚰 sink_installation', '💧 geyser_installation', '💧 water_heater_repair', '🪠 drain_unblocking', '💩 sewer_repairs', '💩 septic_tank_installation', '☔ rainwater_guttering', '🔽 downpipes', '💧 irrigation_systems', '💧 sprinkler_systems', '🔍 plumbing_inspections', '🔧 pipe_replacement', '💧 burst_pipe_repairs', '💧 water_pump_installation', '💧 pressure_pumps', '🏊 pool_plumbing', '🔥 gas_installation', '🔥 gas_stove_connection', '🔥 gas_geyser', '🏢 commercial_plumbing', '🏭 industrial_plumbing', '🏠 residential_plumbing', '🔧 maintenance_plumbing'] },
+'plumbers': { name: '🔧 Plumbers', icon: '🔧', color: '#3b82f6', parent: 'construction', subcategories: ['🔧 pipe_installation', '💧 leak_repairs', '🚰 tap_installation', '🚽 toilet_installation', '🚿 shower_installation', '🛁 bath_installation', '🚰 sink_installation', '💧 geyser_installation', '💧 water_heater_repair', '🪠 drain_unblocking', '💩 sewer_repairs', '💩 septic_tank_installation', '☔ rainwater_guttering', '🔽 downpipes', '?? irrigation_systems', '💧 sprinkler_systems', '🔍 plumbing_inspections', '🔧 pipe_replacement', '💧 burst_pipe_repairs', '💧 water_pump_installation', '💧 pressure_pumps', '🏊 pool_plumbing', '🔥 gas_installation', '🔥 gas_stove_connection', '🔥 gas_geyser', '🏢 commercial_plumbing', '🏭 industrial_plumbing', '?? residential_plumbing', '🔧 maintenance_plumbing'] },
 'painters': { name: '🎨 Painters', icon: '🎨', color: '#ec4898', parent: 'construction', subcategories: ['🏠 interior_painting', '🏠 exterior_painting', '🧱 wall_painting', '🏠 ceiling_painting', '🚪 door_painting', '🪟 window_frame_painting', '🏠 roof_painting', '💧 waterproofing_paint', '🎨 texture_painting', '🎨 spray_painting', '🪑 furniture_painting', '🗄️ cabinet_painting', '🧻 wallpaper_installation', '🧻 wallpaper_removal', '🧱 plastering', '🧱 wall_filling', '🧽 surface_preparation', '💨 sandblasting', '🎨 color_consulting', '🏢 commercial_painting', '🏭 industrial_painting', '🎨 decorative_painting', '🎨 mural_painting'] },
 'welders': { name: '🔥 Welders', icon: '??', color: '#f97316', parent: 'construction', subcategories: ['⚡ arc_welding', '⚡ mig_welding', '⚡ tig_welding', '⚡ stick_welding', '⚡ spot_welding', '🔧 pipe_welding', '🏗️ structural_welding', '🔧 metal_fabrication', '🚪 gate_fabrication', '🚧 fence_welding', '🔒 burglar_bars', '🪟 window_bars', '🚪 steel_doors', '🪑 steel_furniture', '🚛 trailer_repair', '🚗 vehicle_welding', '💨 exhaust_repair', '🏭 industrial_welding', '🪙 aluminum_welding', '🔩 stainless_steel_welding', '🥉 bronze_welding', '🔩 cast_iron_welding', '🏗️ on_site_welding', '🚐 mobile_welding'] },
 'roofers': { name: '🏠 Roofers', icon: '🏠', color: '#a855f7', parent: 'construction', subcategories: ['🏠 roof_installation', '🔧 roof_repairs', '🏠 roof_replacement', '🔍 roof_inspections', '🔧 roof_maintenance', '📦 corrugated_roofing', '🧱 tile_roofing', '🪨 slate_roofing', '🔩 metal_roofing', '🏢 flat_roofing', '🧱 rubber_roofing', '🔥 torch_on_roofing', '💧 leak_detection', '💧 leak_repair', '🧱 ceiling_insulation', '🧱 roof_insulation', '🍂 gutter_installation', '🍂 gutter_cleaning', '🔧 downpipe_repairs', '🏠 fascia_repair', '🏠 soffit_installation', '🪟 skylight_installation', '☀️ solar_mounting', '💧 waterproofing', '🧼 roof_cleaning', '🎨 roof_coating'] },
@@ -30864,7 +30862,7 @@ const PRODUCT_CATEGORIES = {
 'aircraft_rentals': { name: '🛩️ Aircraft Rentals', icon: '🛩️', color: '#f59e0b', parent: 'aviation', subcategories: ['✈️ cessna_rentals', '✈️ piper_rentals', '✈️ cirrus_rentals', '🚁 helicopter_rentals', '💧 wet_rentals', '🏜️ dry_rentals'] },
 'hangar_space': { name: '🏠 Hangar Space', icon: '🏠', color: '#3b82f6', parent: 'aviation', subcategories: ['🛩️ t_hangars', '🏗️ box_hangars', '🌤️ shade_hangars', '👥 community_hangars', '🏠 hangar_rental', '🪢 tiedown_spaces'] },
 'aircraft_maintenance': { name: '🔧 Aircraft Maintenance', icon: '🔧', color: '#8b5cf6', parent: 'aviation', subcategories: ['📋 annual_inspections', '🔧 engine_overhauls', '📡 avionics_repair', '🏗️ airframe_repair', '🎨 paint_aviation', '🪑 interior_restoration'] },
-'drone_services': { name: '🚁 Drone Services', icon: '🚁', color: '#10b981', parent: 'aviation', subcategories: ['📸 aerial_photography_drone', '🗺️ drone_surveying', '📦 drone_delivery', '🔍 drone_inspections', '🗺️ drone_mapping', '🎬 drone_filming', '🌾 agricultural_drone'] },
+'drone_services': { name: '🚁 Drone Services', icon: '🚁', color: '#10b981', parent: 'aviation', subcategories: ['📸 aerial_photography_drone', '🗺️ drone_surveying', '?? drone_delivery', '🔍 drone_inspections', '🗺️ drone_mapping', '🎬 drone_filming', '🌾 agricultural_drone'] },
 
 // ========== INSURANCE SERVICES ==========
 'insurance': { name: '🛡️ Insurance Services', icon: '🛡️', color: '#3b82f6', subcategories: ['🏥 health_insurance', '💖 life_insurance', '🚗 auto_insurance', '🏠 home_insurance', '🏢 business_insurance', '✈️ travel_insurance', '🐾 pet_insurance', '⛵ boat_insurance', '🕯️ funeral_insurance', '✈️ aviation_insurance', '📋 claims_assistance'] },
@@ -47530,7 +47528,7 @@ window.rejectProduct = async function(productId) {
             }
             
             if (typeof addNotification === 'function') {
-                addNotification(sellerId, '🚫 Promotion Cancelled',
+                addNotification(sellerId, '?? Promotion Cancelled',
                     'Your promotion for "' + productName + '" was cancelled because the product was rejected.\n\nPlease resubmit the product first.');
             }
         }
@@ -66823,7 +66821,7 @@ function renderPendingPayoutsSection(pendingPayouts) {
             if (details.type === 'other') {
                 detailsHtml = 
                     '<div style="background:white; border-radius:8px; padding:10px; margin-top:8px;">' +
-                    '<div style="font-weight:600; font-size:12px; color:#7c3aed;">💳 Other Payment Details</div>' +
+                    '<div style="font-weight:600; font-size:12px; color:#7c3aed;">?? Other Payment Details</div>' +
                     '<div style="font-size:11px; margin-top:4px;"><strong>Method:</strong> ' + escapeHtml(details.methodName || 'N/A') + '</div>' +
                     '<div style="font-size:11px;"><strong>Account/Email:</strong> ' + escapeHtml(details.account || 'N/A') + '</div>' +
                     '<div style="font-size:11px;"><strong>Name:</strong> ' + escapeHtml(details.accountName || 'N/A') + '</div>' +
@@ -74020,98 +74018,7 @@ function submitReviewWithImage(productId, orderId) {
 // SOCIAL MEDIA SHARING
 // ==============================================
 
-window.shareProduct = function(productId) {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    
-    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${productId}`;
-    const shareText = `Check out ${product.name} on BRINGMINE ! Only ${formatBWP(product.price)}`;
-    
-    const modalContent = `
-        <div>
-            <h4>?? Share ${escapeHtml(product.name)}</h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;">
-                <button class="pink-btn-outline" onclick="shareOnFacebook('${shareUrl}', '${shareText}')" style="background: #1877f2; color: white;">
-                    📘 Facebook
-                </button>
-                <button class="pink-btn-outline" onclick="shareOnTwitter('${shareUrl}', '${shareText}')" style="background: #1da1f2; color: white;">
-                    X Twitter
-                </button>
-                <button class="pink-btn-outline" onclick="shareOnWhatsApp('${shareUrl}', '${shareText}')" style="background: #25d366; color: white;">
-                    💬 WhatsApp
-                </button>
-                <button class="pink-btn-outline" onclick="shareOnTelegram('${shareUrl}', '${shareText}')" style="background: #0088cc; color: white;">
-                    ✈️ Telegram
-                </button>
-                <button class="pink-btn-outline" onclick="copyShareLink('${shareUrl}')">
-                    🔗 Copy Link
-                </button>
-                <button class="pink-btn-outline" onclick="shareViaPhone('${shareUrl}', '${shareText}')">
-                    📧 Phone
-                </button>
-            </div>
-        </div>
-    `;
-    
-    createModal({
-        id: 'share_modal',
-        title: 'Share Product',
-        content: modalContent,
-        showCloseButton: true,
-        closeOnOverlayClick: true,
-        showFooter: false
-    });
-};
 
-window.shareOnFacebook = function(url, text) {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
-};
-
-window.shareOnTwitter = function(url, text) {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-};
-
-window.shareOnWhatsApp = function(url, text) {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
-};
-
-window.shareOnTelegram = function(url, text) {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
-};
-
-window.copyShareLink = function(url) {
-    navigator.clipboard.writeText(url);
-    alert('✅ Link copied to clipboard!');
-};
-
-window.shareViaPhone = function(url, text) {
-    window.location.href = `mailto:?subject=Check out this product!&body=${encodeURIComponent(text + '\n\n' + url)}`;
-};
-
-// Share wishlist
-window.shareWishlist = function() {
-    var wishlistProducts = getUserWishlistProducts();
-    if (wishlistProducts.length === 0) return;
-    
-    var shareText = '🛍️ Check out my wishlist!\n\n';
-    for (var i = 0; i < wishlistProducts.length; i++) {
-        shareText += '• ' + wishlistProducts[i].name + ' - ' + formatBWP(calculateBulkDiscount(wishlistProducts[i], 1)) + '\n';
-    }
-    shareText += '\nTotal items: ' + wishlistProducts.length;
-    
-    // Try to use share API if available
-    if (navigator.share) {
-        navigator.share({
-            title: 'My Wishlist',
-            text: shareText
-        }).catch(function() {
-            // Fallback - copy to clipboard
-            copyToClipboard(shareText);
-        });
-    } else {
-        copyToClipboard(shareText);
-    }
-};
 
 window.copyToClipboard = function(text) {
     var textarea = document.createElement('textarea');
@@ -75913,15 +75820,6 @@ window.saveCheckoutInfo = function() {
         }
     }
 </script>
-<button id="installAppBtn" style="display:none; position:fixed; bottom:20px; right:20px; z-index:9999; background:#ec4899; color:white; border:none; padding:12px 20px; border-radius:30px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.4); animation:bounce 2s infinite;" onclick="installApp()">
-    📲 Add to Home Screen
-</button>
 
-<style>
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-</style>
 </body>
 </html>
