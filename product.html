@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta property="og:title" content="Product on BRINGMINE">
+  <meta property="og:description" content="Find great deals on BRINGMINE.SHOP">
+  <meta property="og:image" content="https://fieijyaodnlaziqezkum.supabase.co/functions/v1/product-image?p=DEFAULT">
+  <meta property="og:url" content="https://bringmine.shop">
+  <title>BRINGMINE.SHOP</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: sans-serif; background: #fdf2f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: white; border-radius: 20px; padding: 24px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 20px rgba(236,72,153,0.15); }
+    .card img { width: 100%; max-height: 250px; object-fit: contain; border-radius: 16px; margin-bottom: 16px; }
+    .card h2 { font-size: 18px; margin-bottom: 8px; }
+    .card .price { font-size: 28px; font-weight: 800; color: #ec4899; }
+    .card .btn { display: inline-block; padding: 14px 40px; background: #ec4899; color: white; text-decoration: none; border-radius: 30px; font-size: 16px; font-weight: 600; margin-top: 12px; }
+    .badge { display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 15px; font-size: 11px; margin-bottom: 8px; }
+    #loading { color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div id="loading">Loading product...</div>
+  </div>
+  <script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var productId = urlParams.get('p');
+    var siteUrl = 'https://bringmine.shop';
+    
+    if (!productId) {
+      window.location.href = siteUrl;
+    }
+    
+    var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
+    var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
+    
+    fetch(supabaseUrl + '/rest/v1/products?id=eq.' + productId + '&select=data', {
+      headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.length > 0 && data[0].data) {
+        var p = data[0].data;
+        var imgUrl = supabaseUrl + '/functions/v1/product-image?p=' + productId;
+        var productUrl = siteUrl + '?p=' + productId;
+        var desc = (p.description || '').substring(0, 200);
+        
+        document.getElementById('card').innerHTML = 
+          '<img src="' + imgUrl + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' +
+          '<div class="badge">BRINGMINE.SHOP</div>' +
+          '<h2>' + p.name + '</h2>' +
+          '<div class="price">P' + (p.price || 0).toFixed(2) + '</div>' +
+          '<div style="font-size:13px;color:#6b7280;">per ' + (p.unit || 'item') + '</div>' +
+          (desc ? '<div style="color:#4b5563;font-size:13px;margin:12px 0;">' + desc + '</div>' : '') +
+          '<a href="' + productUrl + '" class="btn">View on BRINGMINE</a>';
+        
+        // Update OG tags
+        document.title = p.name + ' - P' + p.price + ' on BRINGMINE';
+      } else {
+        window.location.href = siteUrl;
+      }
+    })
+    .catch(function() {
+      window.location.href = siteUrl;
+    });
+  </script>
+</body>
+</html>
