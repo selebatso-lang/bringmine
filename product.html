@@ -1,76 +1,330 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>BRINGMINE.SHOP</title>
     
     <!-- Open Graph - WhatsApp preview -->
-    <meta property="og:title" content="BRINGMINE.SHOP - Online Marketplace">
-    <meta property="og:description" content="Find great deals on products near you. Buy and sell locally in Botswana.">
+    <meta property="og:title" content="🛍️ New product waiting for you on BRINGMINE!">
+    <meta property="og:description" content="💰 Tap to see price & details — you might love this deal! 🚚 Delivery available near you. Shop now on Botswana's neighborhood marketplace.">
     <meta property="og:image" content="https://www.bringmine.shop/android-chrome-192x192.png">
     <meta property="og:url" content="https://www.bringmine.shop/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="BRINGMINE.SHOP">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://www.bringmine.shop/android-chrome-192x192.png">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: sans-serif; background: #fdf2f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .card { background: white; border-radius: 20px; padding: 24px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 20px rgba(236,72,153,0.15); }
-    .card img { width: 100%; max-height: 250px; object-fit: contain; border-radius: 16px; margin-bottom: 16px; }
-    .card h2 { font-size: 18px; margin-bottom: 8px; }
-    .card .price { font-size: 28px; font-weight: 800; color: #ec4899; }
-    .card .btn { display: inline-block; padding: 14px 40px; background: #ec4899; color: white; text-decoration: none; border-radius: 30px; font-size: 16px; font-weight: 600; margin-top: 12px; }
-    .badge { display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 15px; font-size: 11px; margin-bottom: 8px; }
-    #loading { color: #6b7280; }
-  </style>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fdf2f8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 24px 24px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(236, 72, 153, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ec4899, #f59e0b, #ec4899);
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .card img {
+            width: 100%;
+            max-height: 260px;
+            object-fit: contain;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            background: #fafafa;
+            border: 2px solid #fbcfe8;
+        }
+        
+        .card h2 {
+            color: #ec4899;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        
+        .category {
+            display: inline-block;
+            background: #fdf2f8;
+            color: #be185d;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .price-row {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 8px 0 12px;
+        }
+        
+        .price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #f59e0b;
+            line-height: 1;
+        }
+        
+        .unit {
+            font-size: 13px;
+            color: #92400e;
+            margin-top: 2px;
+        }
+        
+        .desc {
+            color: #4b5563;
+            font-size: 13px;
+            margin: 12px 0;
+            line-height: 1.5;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 3px solid #ec4899;
+            text-align: left;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+        
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+        }
+        
+        .footer-info {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .footer-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .link {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 10px;
+        }
+        
+        .link a {
+            color: #ec4899;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        #loading {
+            padding: 40px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        #loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #fbcfe8;
+            border-top: 3px solid #ec4899;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .error-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .error-state h3 {
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .error-state p {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <div id="loading">Loading product...</div>
-  </div>
-  <script>
-    var urlParams = new URLSearchParams(window.location.search);
-    var productId = urlParams.get('p');
-    var siteUrl = 'https://bringmine.shop';
+    <div class="card" id="card">
+        <div id="loading">
+            <div class="spinner"></div>
+            Loading product...
+        </div>
+    </div>
     
-    if (!productId) {
-      window.location.href = siteUrl;
-    }
-    
-    var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
-    var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
-    
-    fetch(supabaseUrl + '/rest/v1/products?id=eq.' + productId + '&select=data', {
-      headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data && data.length > 0 && data[0].data) {
-        var p = data[0].data;
-        var imgUrl = supabaseUrl + '/functions/v1/product-image?p=' + productId;
-        var productUrl = siteUrl + '?p=' + productId;
-        var desc = (p.description || '').substring(0, 200);
-        
-        document.getElementById('card').innerHTML = 
-          '<img src="' + imgUrl + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' +
-          '<div class="badge">BRINGMINE.SHOP</div>' +
-          '<h2>' + p.name + '</h2>' +
-          '<div class="price">P' + (p.price || 0).toFixed(2) + '</div>' +
-          '<div style="font-size:13px;color:#6b7280;">per ' + (p.unit || 'item') + '</div>' +
-          (desc ? '<div style="color:#4b5563;font-size:13px;margin:12px 0;">' + desc + '</div>' : '') +
-          '<a href="' + productUrl + '" class="btn">View on BRINGMINE</a>';
-        
-        // Update OG tags
-        document.title = p.name + ' - P' + p.price + ' on BRINGMINE';
-      } else {
-        window.location.href = siteUrl;
-      }
-    })
-    .catch(function() {
-      window.location.href = siteUrl;
-    });
-  </script>
+    <script>
+        (function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var productId = urlParams.get('p');
+            var siteUrl = 'https://www.bringmine.shop';
+            var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
+            var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
+            
+            if (!productId) {
+                window.location.href = siteUrl;
+                return;
+            }
+            
+            var card = document.getElementById('card');
+            
+            fetch(supabaseUrl + '/rest/v1/products?select=data&id=eq.' + encodeURIComponent(productId), {
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': 'Bearer ' + supabaseKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Failed');
+                return response.json();
+            })
+            .then(function(data) {
+                if (!data || data.length === 0 || !data[0].data) {
+                    showError();
+                    return;
+                }
+                
+                var p = data[0].data;
+                var imgUrl = supabaseUrl + '/functions/v1/product-image?p=' + productId;
+                var productUrl = siteUrl + '?p=' + productId;
+                var desc = (p.description || '').substring(0, 250);
+                if (p.description && p.description.length > 250) desc += '...';
+                var category = p.mainCategory || p.categoryName || '';
+                
+                // Update page title for browser tab
+                document.title = p.name + ' - P' + (p.price || 0).toFixed(2) + ' | BRINGMINE';
+                
+                var html = '';
+                
+                // Image with fallback
+                html += '<img src="' + imgUrl + '" alt="' + escapeHtml(p.name) + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22><rect fill=%22%23fdf2f8%22 width=%22300%22 height=%22200%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2240%22>🛍️</text></svg>\'">';
+                
+                // Badge
+                html += '<div class="badge">BRINGMINE.SHOP</div>';
+                
+                // Product name
+                html += '<h2>' + escapeHtml(p.name) + '</h2>';
+                
+                // Category
+                if (category) {
+                    html += '<div class="category">' + escapeHtml(category) + '</div>';
+                }
+                
+                // Price in highlighted box
+                html += '<div class="price-row">';
+                html += '<div class="price">P' + (p.price || 0).toFixed(2) + '</div>';
+                html += '<div class="unit">per ' + escapeHtml(p.unit || 'item') + '</div>';
+                html += '</div>';
+                
+                // Description
+                if (desc) {
+                    html += '<div class="desc">' + escapeHtml(desc) + '</div>';
+                }
+                
+                // CTA button
+                html += '<a href="' + productUrl + '" class="btn">View Full Details on BRINGMINE</a>';
+                
+                // Trust indicators
+                html += '<div class="footer-info">';
+                html += '<span>🚚 Delivery available</span>';
+                html += '<span>📍 Near you</span>';
+                html += '</div>';
+                
+                // Site link
+                html += '<div class="link">Browse more on <a href="' + siteUrl + '">bringmine.shop</a></div>';
+                
+                card.innerHTML = html;
+            })
+            .catch(function() {
+                showError();
+            });
+            
+            function showError() {
+                card.innerHTML = 
+                    '<div class="error-state">' +
+                    '<div class="icon">📦</div>' +
+                    '<h3>Product Unavailable</h3>' +
+                    '<p>This listing may have been removed or is no longer available.</p>' +
+                    '<a href="' + siteUrl + '" class="btn">Browse BRINGMINE</a>' +
+                    '<div class="link" style="margin-top:12px;">Find something new at <a href="' + siteUrl + '">bringmine.shop</a></div>' +
+                    '</div>';
+            }
+            
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+        })();
+    </script>
 </body>
 </html>
