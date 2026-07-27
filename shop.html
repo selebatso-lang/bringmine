@@ -243,40 +243,50 @@
             }
             
             function countAndRender(sellerName, location) {
-                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': 'Bearer ' + supabaseKey,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(products) {
-                    var count = 0;
-                    var targetSeller = shopId.replace(/\s+/g, '');
-                    
-                    for (var i = 0; i < products.length; i++) {
-                        var p = products[i].data;
-                        if (!p) continue;
-                        
-                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
-                        var match = (pSeller === targetSeller || pSeller.slice(-4) === targetSeller.slice(-4));
-                        
-                        if (match && p.approved === true && p.stock > 0) {
-                            count++;
-                            if (sellerName === 'Shop' && p.sellerName) sellerName = p.sellerName;
-                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
-                                location = p.businessLocation || p.sellerLocation;
-                            }
-                        }
-                    }
-                    
-                    renderCard(sellerName, location, count);
-                })
-                .catch(function() {
-                    renderCard(sellerName, location, 0);
-                });
+    fetch(supabaseUrl + '/rest/v1/products?select=data&limit=500', {
+        headers: {
+            'apikey': supabaseKey,
+            'Authorization': 'Bearer ' + supabaseKey,
+            'Accept': 'application/json'
+        }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(products) {
+        var count = 0;
+        var targetSeller = shopId.replace(/\s+/g, '');
+        
+        console.log('Shop ID:', targetSeller);
+        console.log('Total products fetched:', products.length);
+        
+        for (var i = 0; i < products.length; i++) {
+            var p = products[i].data;
+            if (!p) continue;
+            
+            var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
+            
+            // Debug first few
+            if (i < 3) {
+                console.log('Product:', p.name, '| sellerId:', pSeller, '| approved:', p.approved, '| stock:', p.stock);
             }
+            
+            var match = (pSeller === targetSeller || pSeller.slice(-4) === targetSeller.slice(-4));
+            
+            if (match) {
+                console.log('MATCH:', p.name, '| approved:', p.approved, '| stock:', p.stock);
+                if (p.approved === true && p.stock > 0) {
+                    count++;
+                }
+            }
+        }
+        
+        console.log('Final count:', count);
+        renderCard(sellerName, location, count);
+    })
+    .catch(function(e) {
+        console.error('Fetch error:', e);
+        renderCard(sellerName, location, 0);
+    });
+}
             
             // Fetch seller info then count products
             fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
