@@ -106,11 +106,6 @@
             font-size: 13px;
             color: #6b7280;
         }
-        .location-icon {
-            width: 14px;
-            height: 14px;
-            display: inline-block;
-        }
         .features {
             display: flex;
             justify-content: center;
@@ -150,10 +145,7 @@
             text-decoration: none;
             font-weight: 700;
         }
-        #loading { 
-            padding: 60px 20px; 
-            color: #6b7280; 
-        }
+        #loading { padding: 60px 20px; color: #6b7280; }
         .spinner {
             width: 40px; height: 40px;
             border: 3px solid #fbcfe8;
@@ -163,7 +155,6 @@
             margin: 0 auto 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .error-state { padding: 40px 20px; text-align: center; }
         .error-state h3 { color: #1f2937; margin-bottom: 6px; }
         .error-state p { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
@@ -203,139 +194,35 @@
             var card = document.getElementById('card');
             var shopUrl = siteUrl + '?shop=' + shopId;
             
-            // Fetch seller info from users table
-            fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
-                headers: {
-                    'apikey': supabaseKey,
-                    'Authorization': 'Bearer ' + supabaseKey,
-                    'Accept': 'application/json'
-                }
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(users) {
-                var sellerName = 'Shop';
-                var location = 'Botswana';
-                
-                if (users && users.length > 0 && users[0].data) {
-                    var u = users[0].data;
-                    sellerName = u.name || u.businessName || u.sellerName || 'Shop';
-                    location = u.location || u.village || u.town || u.businessLocation || 'Botswana';
-                }
-                
-                // Now count products
-                return fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': 'Bearer ' + supabaseKey,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(products) {
-                    var count = 0;
-                    
-                    for (var i = 0; i < products.length; i++) {
-                        var p = products[i].data;
-                        if (!p) continue;
-                        
-                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
-                        
-                        if (pSeller === shopId && p.approved === true && p.stock > 0) {
-                            count++;
-                            // Update seller name from products if not found in users
-                            if (sellerName === 'Shop' && p.sellerName) {
-                                sellerName = p.sellerName;
-                            }
-                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
-                                location = p.businessLocation || p.sellerLocation;
-                            }
-                        }
-                    }
-                    
-                    renderCard(sellerName, location, count);
-                });
-            })
-            .catch(function() {
-                // Try counting products anyway
-                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
-                    headers: {
-                        'apikey': supabaseKey,
-                        'Authorization': 'Bearer ' + supabaseKey,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(products) {
-                    var sellerName = 'Shop';
-                    var location = 'Botswana';
-                    var count = 0;
-                    
-                    for (var i = 0; i < products.length; i++) {
-                        var p = products[i].data;
-                        if (!p) continue;
-                        
-                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
-                        
-                        if (pSeller === shopId && p.approved === true && p.stock > 0) {
-                            count++;
-                            if (sellerName === 'Shop' && p.sellerName) sellerName = p.sellerName;
-                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
-                                location = p.businessLocation || p.sellerLocation;
-                            }
-                        }
-                    }
-                    
-                    renderCard(sellerName, location, count);
-                })
-                .catch(function() {
-                    showError();
-                });
-            });
-            
             function renderCard(name, location, count) {
                 var maskedPhone = shopId.length >= 4 ? '....' + shopId.slice(-4) : shopId;
-                
                 document.title = name + ' on BRINGMINE';
                 
                 var html = '';
-                
-                // Top gradient section
                 html += '<div class="card-top">';
                 html += '<div class="shop-icon">&#127968;</div>';
                 html += '<div class="badge">BRINGMINE.SHOP</div>';
                 html += '<div class="shop-name">' + esc(name) + '</div>';
                 html += '<div class="shop-phone">' + esc(maskedPhone) + '</div>';
                 html += '</div>';
-                
-                // Body section
                 html += '<div class="card-body">';
-                
-                // Stats
                 html += '<div class="stats">';
                 html += '<div class="stat"><div class="stat-number">' + count + '</div><div class="stat-label">Products</div></div>';
                 html += '<div class="stat"><div class="stat-number">&#128666;</div><div class="stat-label">Delivery</div></div>';
                 html += '<div class="stat"><div class="stat-number">&#11088;</div><div class="stat-label">Seller</div></div>';
                 html += '</div>';
-                
-                // Location
                 html += '<div class="location-row">';
-                html += '<span class="location-icon"><svg viewBox="0 0 24 24" fill="#6b7280" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></span>';
+                html += '<svg viewBox="0 0 24 24" fill="#6b7280" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>';
                 html += esc(location);
                 html += '</div>';
-                
-                // Features
                 html += '<div class="features">';
                 html += '<div class="feature-pill">&#10003; Verified</div>';
                 html += '<div class="feature-pill">&#128666; Delivery Available</div>';
                 html += '<div class="feature-pill">&#128176; Great Deals</div>';
                 html += '</div>';
-                
-                // CTA
                 html += '<a href="' + shopUrl + '" class="cta-button">View Shop on BRINGMINE</a>';
                 html += '<div class="footer-link">Browse more on <a href="' + siteUrl + '">bringmine.shop</a></div>';
-                
                 html += '</div>';
-                
                 card.innerHTML = html;
             }
             
@@ -354,6 +241,67 @@
                 d.textContent = str;
                 return d.innerHTML;
             }
+            
+            function countAndRender(sellerName, location) {
+                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': 'Bearer ' + supabaseKey,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(products) {
+                    var count = 0;
+                    var targetSeller = shopId.replace(/\s+/g, '');
+                    
+                    for (var i = 0; i < products.length; i++) {
+                        var p = products[i].data;
+                        if (!p) continue;
+                        
+                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
+                        var match = (pSeller === targetSeller || pSeller.slice(-4) === targetSeller.slice(-4));
+                        
+                        if (match && p.approved === true && p.stock > 0) {
+                            count++;
+                            if (sellerName === 'Shop' && p.sellerName) sellerName = p.sellerName;
+                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
+                                location = p.businessLocation || p.sellerLocation;
+                            }
+                        }
+                    }
+                    
+                    renderCard(sellerName, location, count);
+                })
+                .catch(function() {
+                    renderCard(sellerName, location, 0);
+                });
+            }
+            
+            // Fetch seller info then count products
+            fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': 'Bearer ' + supabaseKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                var sellerName = 'Shop';
+                var location = 'Botswana';
+                
+                if (users && users.length > 0 && users[0].data) {
+                    var u = users[0].data;
+                    sellerName = u.name || u.businessName || u.sellerName || 'Shop';
+                    location = u.location || u.village || u.town || u.businessLocation || 'Botswana';
+                }
+                
+                countAndRender(sellerName, location);
+            })
+            .catch(function() {
+                countAndRender('Shop', 'Botswana');
+            });
         })();
     </script>
 </body>
