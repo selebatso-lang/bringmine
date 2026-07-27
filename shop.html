@@ -182,6 +182,9 @@
         (function() {
             var urlParams = new URLSearchParams(window.location.search);
             var shopId = (urlParams.get('shop') || '').replace(/\s+/g, '');
+if (shopId.charAt(0) !== '+') {
+    shopId = '+' + shopId;
+}
             var siteUrl = 'https://www.bringmine.shop';
             var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
             var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
