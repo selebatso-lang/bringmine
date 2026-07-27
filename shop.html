@@ -17,7 +17,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #fdf2f8;
+            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -26,60 +26,68 @@
         }
         .card {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             width: 100%;
             max-width: 420px;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(236,72,153,0.15);
             text-align: center;
-            padding: 32px 24px;
+        }
+        .card-top {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            padding: 32px 24px 40px;
+            color: white;
         }
         .shop-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #ec4899, #db2777);
+            width: 72px;
+            height: 72px;
+            background: rgba(255,255,255,0.2);
             border-radius: 50%;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 36px;
+            font-size: 32px;
         }
         .badge {
             display: inline-block;
-            background: #10b981;
+            background: rgba(255,255,255,0.2);
             color: white;
             padding: 4px 14px;
             border-radius: 15px;
             font-size: 11px;
             font-weight: 700;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
         }
         .shop-name {
             font-size: 22px;
             font-weight: 800;
-            color: #1f2937;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
         }
-        .shop-info {
+        .shop-phone {
             font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 4px;
+            opacity: 0.85;
+        }
+        .card-body {
+            padding: 0 24px 24px;
+            margin-top: -20px;
         }
         .stats {
             display: flex;
             justify-content: center;
-            gap: 24px;
-            margin: 16px 0;
+            gap: 16px;
+            margin-bottom: 20px;
         }
         .stat {
-            background: #f9fafb;
-            padding: 12px 20px;
-            border-radius: 14px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            min-width: 80px;
         }
         .stat-number {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: #ec4899;
         }
@@ -87,21 +95,53 @@
             font-size: 10px;
             color: #6b7280;
             font-weight: 600;
+            margin-top: 2px;
+        }
+        .location-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .location-icon {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .feature-pill {
+            background: #f0fdf4;
+            color: #065f46;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
         }
         .cta-button {
-            display: inline-block;
-            padding: 16px 48px;
+            display: block;
+            width: 100%;
+            padding: 16px;
             background: linear-gradient(135deg, #ec4899, #db2777);
             color: white;
+            text-align: center;
             text-decoration: none;
-            border-radius: 30px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 700;
             box-shadow: 0 6px 20px rgba(236,72,153,0.35);
-            margin-top: 8px;
+            margin-bottom: 8px;
         }
+        .cta-button:active { transform: scale(0.98); }
         .footer-link {
-            margin-top: 12px;
             font-size: 11px;
             color: #9ca3af;
         }
@@ -110,7 +150,10 @@
             text-decoration: none;
             font-weight: 700;
         }
-        #loading { padding: 40px; color: #6b7280; }
+        #loading { 
+            padding: 60px 20px; 
+            color: #6b7280; 
+        }
         .spinner {
             width: 40px; height: 40px;
             border: 3px solid #fbcfe8;
@@ -120,20 +163,34 @@
             margin: 0 auto 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .error-state { padding: 40px 20px; text-align: center; }
+        .error-state h3 { color: #1f2937; margin-bottom: 6px; }
+        .error-state p { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
+        .error-btn {
+            display: inline-block;
+            padding: 14px 36px;
+            background: #ec4899;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="card" id="card">
         <div id="loading">
             <div class="spinner"></div>
-            <div style="font-weight:600;">Loading shop...</div>
+            <div style="font-weight:600;">Opening shop...</div>
         </div>
     </div>
     
     <script>
         (function() {
             var urlParams = new URLSearchParams(window.location.search);
-            var shopId = urlParams.get('shop');
+            var shopId = (urlParams.get('shop') || '').replace(/\s+/g, '');
             var siteUrl = 'https://www.bringmine.shop';
             var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
             var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
@@ -144,77 +201,153 @@
             }
             
             var card = document.getElementById('card');
+            var shopUrl = siteUrl + '?shop=' + shopId;
             
-            // Fetch seller info
-            Promise.all([
-                fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
-                    headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
-                }).then(function(r) { return r.json(); }),
-                fetch(supabaseUrl + '/rest/v1/products?select=data&id=eq.' + encodeURIComponent(shopId + '_fullimg'), {
-                    headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
-                }).then(function(r) { return r.json(); })
-            ])
-            .then(function(results) {
-                var users = results[0];
-                var shopPicture = results[1];
-                
-                var sellerName = 'Seller';
+            // Fetch seller info from users table
+            fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': 'Bearer ' + supabaseKey,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                var sellerName = 'Shop';
                 var location = 'Botswana';
-                var productCount = 0;
                 
                 if (users && users.length > 0 && users[0].data) {
                     var u = users[0].data;
-                    sellerName = u.name || u.businessName || 'Seller';
-                    location = u.location || u.village || u.town || 'Botswana';
+                    sellerName = u.name || u.businessName || u.sellerName || 'Shop';
+                    location = u.location || u.village || u.town || u.businessLocation || 'Botswana';
                 }
                 
-                var shopUrl = siteUrl + '?shop=' + shopId;
-                var maskedName = shopId.length >= 4 ? '....' + shopId.slice(-4) : sellerName;
-                
-                document.title = sellerName + ' on BRINGMINE';
-                
-                var html = '';
-                html += '<div class="shop-icon">&#127968;</div>';
-                html += '<div class="badge">BRINGMINE.SHOP</div>';
-                html += '<div class="shop-name">' + esc(sellerName) + '</div>';
-                html += '<div class="shop-info">' + esc(maskedName) + '</div>';
-                html += '<div class="shop-info">&#128205; ' + esc(location) + '</div>';
-                html += '<div class="stats">';
-                html += '<div class="stat"><div class="stat-number" id="prodCount">...</div><div class="stat-label">Products</div></div>';
-                html += '<div class="stat"><div class="stat-number">&#128666;</div><div class="stat-label">Delivery</div></div>';
-                html += '</div>';
-                html += '<a href="' + shopUrl + '" class="cta-button">View Shop on BRINGMINE</a>';
-                html += '<div class="footer-link">Browse more on <a href="' + siteUrl + '">bringmine.shop</a></div>';
-                
-                card.innerHTML = html;
-                
-                // Count products
-                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=50', {
-                    headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey }
+                // Now count products
+                return fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': 'Bearer ' + supabaseKey,
+                        'Accept': 'application/json'
+                    }
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(products) {
                     var count = 0;
+                    
                     for (var i = 0; i < products.length; i++) {
-                        if (products[i].data && 
-                            (products[i].data.sellerId === shopId || products[i].data.sellerPhone === shopId) &&
-                            products[i].data.approved && products[i].data.stock > 0) {
+                        var p = products[i].data;
+                        if (!p) continue;
+                        
+                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
+                        
+                        if (pSeller === shopId && p.approved === true && p.stock > 0) {
                             count++;
+                            // Update seller name from products if not found in users
+                            if (sellerName === 'Shop' && p.sellerName) {
+                                sellerName = p.sellerName;
+                            }
+                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
+                                location = p.businessLocation || p.sellerLocation;
+                            }
                         }
                     }
-                    document.getElementById('prodCount').textContent = count;
-                })
-                .catch(function() {
-                    document.getElementById('prodCount').textContent = '--';
+                    
+                    renderCard(sellerName, location, count);
                 });
             })
             .catch(function() {
-                card.innerHTML = 
-                    '<div class="shop-icon">&#127968;</div>' +
-                    '<h3 style="color:#1f2937;margin-bottom:8px;">Shop Unavailable</h3>' +
-                    '<p style="color:#6b7280;font-size:13px;margin-bottom:16px;">This shop may no longer be available.</p>' +
-                    '<a href="' + siteUrl + '" class="cta-button">Browse BRINGMINE</a>';
+                // Try counting products anyway
+                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=200', {
+                    headers: {
+                        'apikey': supabaseKey,
+                        'Authorization': 'Bearer ' + supabaseKey,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(products) {
+                    var sellerName = 'Shop';
+                    var location = 'Botswana';
+                    var count = 0;
+                    
+                    for (var i = 0; i < products.length; i++) {
+                        var p = products[i].data;
+                        if (!p) continue;
+                        
+                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
+                        
+                        if (pSeller === shopId && p.approved === true && p.stock > 0) {
+                            count++;
+                            if (sellerName === 'Shop' && p.sellerName) sellerName = p.sellerName;
+                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) {
+                                location = p.businessLocation || p.sellerLocation;
+                            }
+                        }
+                    }
+                    
+                    renderCard(sellerName, location, count);
+                })
+                .catch(function() {
+                    showError();
+                });
             });
+            
+            function renderCard(name, location, count) {
+                var maskedPhone = shopId.length >= 4 ? '....' + shopId.slice(-4) : shopId;
+                
+                document.title = name + ' on BRINGMINE';
+                
+                var html = '';
+                
+                // Top gradient section
+                html += '<div class="card-top">';
+                html += '<div class="shop-icon">&#127968;</div>';
+                html += '<div class="badge">BRINGMINE.SHOP</div>';
+                html += '<div class="shop-name">' + esc(name) + '</div>';
+                html += '<div class="shop-phone">' + esc(maskedPhone) + '</div>';
+                html += '</div>';
+                
+                // Body section
+                html += '<div class="card-body">';
+                
+                // Stats
+                html += '<div class="stats">';
+                html += '<div class="stat"><div class="stat-number">' + count + '</div><div class="stat-label">Products</div></div>';
+                html += '<div class="stat"><div class="stat-number">&#128666;</div><div class="stat-label">Delivery</div></div>';
+                html += '<div class="stat"><div class="stat-number">&#11088;</div><div class="stat-label">Seller</div></div>';
+                html += '</div>';
+                
+                // Location
+                html += '<div class="location-row">';
+                html += '<span class="location-icon"><svg viewBox="0 0 24 24" fill="#6b7280" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></span>';
+                html += esc(location);
+                html += '</div>';
+                
+                // Features
+                html += '<div class="features">';
+                html += '<div class="feature-pill">&#10003; Verified</div>';
+                html += '<div class="feature-pill">&#128666; Delivery Available</div>';
+                html += '<div class="feature-pill">&#128176; Great Deals</div>';
+                html += '</div>';
+                
+                // CTA
+                html += '<a href="' + shopUrl + '" class="cta-button">View Shop on BRINGMINE</a>';
+                html += '<div class="footer-link">Browse more on <a href="' + siteUrl + '">bringmine.shop</a></div>';
+                
+                html += '</div>';
+                
+                card.innerHTML = html;
+            }
+            
+            function showError() {
+                card.innerHTML = 
+                    '<div class="error-state">' +
+                    '<div style="font-size:48px;margin-bottom:12px;">&#127968;</div>' +
+                    '<h3>Shop Unavailable</h3>' +
+                    '<p>This shop may no longer be available or has no products yet.</p>' +
+                    '<a href="' + siteUrl + '" class="error-btn">Browse BRINGMINE</a>' +
+                    '</div>';
+            }
             
             function esc(str) {
                 var d = document.createElement('div');
