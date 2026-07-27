@@ -15,159 +15,32 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-        }
-        .card {
-            background: white;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(236,72,153,0.15);
-            text-align: center;
-        }
-        .card-top {
-            background: linear-gradient(135deg, #ec4899, #db2777);
-            padding: 32px 24px 40px;
-            color: white;
-        }
-        .shop-icon {
-            width: 72px;
-            height: 72px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-        .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-        .shop-name {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 2px;
-        }
-        .shop-phone {
-            font-size: 13px;
-            opacity: 0.85;
-        }
-        .card-body {
-            padding: 0 24px 24px;
-            margin-top: -20px;
-        }
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        .stat {
-            background: white;
-            padding: 16px 20px;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            min-width: 80px;
-        }
-        .stat-number {
-            font-size: 26px;
-            font-weight: 800;
-            color: #ec4899;
-        }
-        .stat-label {
-            font-size: 10px;
-            color: #6b7280;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        .location-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .feature-pill {
-            background: #f0fdf4;
-            color: #065f46;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .cta-button {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #ec4899, #db2777);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 700;
-            box-shadow: 0 6px 20px rgba(236,72,153,0.35);
-            margin-bottom: 8px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #fdf2f8, #fce7f3); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px; }
+        .card { background: white; border-radius: 24px; width: 100%; max-width: 420px; overflow: hidden; box-shadow: 0 10px 40px rgba(236,72,153,0.15); text-align: center; }
+        .card-top { background: linear-gradient(135deg, #ec4899, #db2777); padding: 32px 24px 40px; color: white; }
+        .shop-icon { width: 72px; height: 72px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .badge { display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 4px 14px; border-radius: 15px; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+        .shop-name { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .shop-phone { font-size: 13px; opacity: 0.85; }
+        .card-body { padding: 0 24px 24px; margin-top: -20px; }
+        .stats { display: flex; justify-content: center; gap: 16px; margin-bottom: 20px; }
+        .stat { background: white; padding: 16px 20px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); min-width: 80px; }
+        .stat-number { font-size: 26px; font-weight: 800; color: #ec4899; }
+        .stat-label { font-size: 10px; color: #6b7280; font-weight: 600; margin-top: 2px; }
+        .location-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px; font-size: 13px; color: #6b7280; }
+        .features { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .feature-pill { background: #f0fdf4; color: #065f46; padding: 5px 12px; border-radius: 15px; font-size: 10px; font-weight: 600; }
+        .cta-button { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, #ec4899, #db2777); color: white; text-align: center; text-decoration: none; border-radius: 16px; font-size: 16px; font-weight: 700; box-shadow: 0 6px 20px rgba(236,72,153,0.35); margin-bottom: 8px; }
         .cta-button:active { transform: scale(0.98); }
-        .footer-link {
-            font-size: 11px;
-            color: #9ca3af;
-        }
-        .footer-link a {
-            color: #ec4899;
-            text-decoration: none;
-            font-weight: 700;
-        }
+        .footer-link { font-size: 11px; color: #9ca3af; }
+        .footer-link a { color: #ec4899; text-decoration: none; font-weight: 700; }
         #loading { padding: 60px 20px; color: #6b7280; }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 3px solid #fbcfe8;
-            border-top-color: #ec4899;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto 16px;
-        }
+        .spinner { width: 40px; height: 40px; border: 3px solid #fbcfe8; border-top-color: #ec4899; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .error-state { padding: 40px 20px; text-align: center; }
         .error-state h3 { color: #1f2937; margin-bottom: 6px; }
         .error-state p { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
-        .error-btn {
-            display: inline-block;
-            padding: 14px 36px;
-            background: #ec4899;
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 14px;
-        }
+        .error-btn { display: inline-block; padding: 14px 36px; background: #ec4899; color: white; text-decoration: none; border-radius: 30px; font-weight: 700; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -181,62 +54,30 @@
     <script>
         (function() {
             var urlParams = new URLSearchParams(window.location.search);
-            var shopId = (urlParams.get('shop') || '').replace(/\s+/g, '');
-if (shopId.charAt(0) !== '+') {
-    shopId = '+' + shopId;
-}
+            var rawShopId = urlParams.get('shop') || '';
+            var shopId = rawShopId.replace(/\s+/g, '');
+            if (!shopId) { window.location.href = 'https://www.bringmine.shop'; return; }
+            if (shopId.charAt(0) !== '+') shopId = '+' + shopId;
+            
             var siteUrl = 'https://www.bringmine.shop';
             var supabaseUrl = 'https://fieijyaodnlaziqezkum.supabase.co';
             var supabaseKey = 'sb_publishable_X5p_Eu3LpQ8oCccZ6IFQww_9BQuWgBi';
-            
-            if (!shopId) {
-                window.location.href = siteUrl;
-                return;
-            }
-            
             var card = document.getElementById('card');
-            var shopUrl = siteUrl + '?shop=' + shopId;
+            var shopUrl = siteUrl + '?shop=' + encodeURIComponent(shopId);
             
             function renderCard(name, location, count) {
                 var maskedPhone = shopId.length >= 4 ? '....' + shopId.slice(-4) : shopId;
                 document.title = name + ' on BRINGMINE';
-                
                 var html = '';
-                html += '<div class="card-top">';
-                html += '<div class="shop-icon">&#127968;</div>';
-                html += '<div class="badge">BRINGMINE.SHOP</div>';
-                html += '<div class="shop-name">' + esc(name) + '</div>';
-                html += '<div class="shop-phone">' + esc(maskedPhone) + '</div>';
-                html += '</div>';
+                html += '<div class="card-top"><div class="shop-icon">&#127968;</div><div class="badge">BRINGMINE.SHOP</div><div class="shop-name">' + esc(name) + '</div><div class="shop-phone">' + esc(maskedPhone) + '</div></div>';
                 html += '<div class="card-body">';
-                html += '<div class="stats">';
-                html += '<div class="stat"><div class="stat-number">' + count + '</div><div class="stat-label">Products</div></div>';
-                html += '<div class="stat"><div class="stat-number">&#128666;</div><div class="stat-label">Delivery</div></div>';
-                html += '<div class="stat"><div class="stat-number">&#11088;</div><div class="stat-label">Seller</div></div>';
-                html += '</div>';
-                html += '<div class="location-row">';
-                html += '<svg viewBox="0 0 24 24" fill="#6b7280" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>';
-                html += esc(location);
-                html += '</div>';
-                html += '<div class="features">';
-                html += '<div class="feature-pill">&#10003; Verified</div>';
-                html += '<div class="feature-pill">&#128666; Delivery Available</div>';
-                html += '<div class="feature-pill">&#128176; Great Deals</div>';
-                html += '</div>';
+                html += '<div class="stats"><div class="stat"><div class="stat-number">' + count + '</div><div class="stat-label">Products</div></div><div class="stat"><div class="stat-number">&#128666;</div><div class="stat-label">Delivery</div></div><div class="stat"><div class="stat-number">&#11088;</div><div class="stat-label">Seller</div></div></div>';
+                html += '<div class="location-row"><svg viewBox="0 0 24 24" fill="#6b7280" width="14" height="14"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg> ' + esc(location) + '</div>';
+                html += '<div class="features"><div class="feature-pill">&#10003; Verified</div><div class="feature-pill">&#128666; Delivery Available</div><div class="feature-pill">&#128176; Great Deals</div></div>';
                 html += '<a href="' + shopUrl + '" class="cta-button">View Shop on BRINGMINE</a>';
                 html += '<div class="footer-link">Browse more on <a href="' + siteUrl + '">bringmine.shop</a></div>';
                 html += '</div>';
                 card.innerHTML = html;
-            }
-            
-            function showError() {
-                card.innerHTML = 
-                    '<div class="error-state">' +
-                    '<div style="font-size:48px;margin-bottom:12px;">&#127968;</div>' +
-                    '<h3>Shop Unavailable</h3>' +
-                    '<p>This shop may no longer be available or has no products yet.</p>' +
-                    '<a href="' + siteUrl + '" class="error-btn">Browse BRINGMINE</a>' +
-                    '</div>';
             }
             
             function esc(str) {
@@ -246,75 +87,42 @@ if (shopId.charAt(0) !== '+') {
             }
             
             function countAndRender(sellerName, location) {
-    fetch(supabaseUrl + '/rest/v1/products?select=data&limit=500', {
-        headers: {
-            'apikey': supabaseKey,
-            'Authorization': 'Bearer ' + supabaseKey,
-            'Accept': 'application/json'
-        }
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(products) {
-        var count = 0;
-        var targetSeller = shopId.replace(/\s+/g, '');
-        
-        console.log('Shop ID:', targetSeller);
-        console.log('Total products fetched:', products.length);
-        
-        for (var i = 0; i < products.length; i++) {
-            var p = products[i].data;
-            if (!p) continue;
-            
-            var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
-            
-            // Debug first few
-            if (i < 3) {
-                console.log('Product:', p.name, '| sellerId:', pSeller, '| approved:', p.approved, '| stock:', p.stock);
+                fetch(supabaseUrl + '/rest/v1/products?select=data&limit=500', {
+                    headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey, 'Accept': 'application/json' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(products) {
+                    var count = 0;
+                    var targetSeller = shopId.replace(/\s+/g, '');
+                    for (var i = 0; i < products.length; i++) {
+                        var p = products[i].data;
+                        if (!p) continue;
+                        var pSeller = (p.sellerId || p.sellerPhone || '').replace(/\s+/g, '');
+                        if (pSeller === targetSeller && p.approved === true && p.stock > 0) {
+                            count++;
+                            if ((sellerName === 'Shop' || !sellerName) && p.sellerName) sellerName = p.sellerName;
+                            if (location === 'Botswana' && (p.businessLocation || p.sellerLocation)) location = p.businessLocation || p.sellerLocation;
+                        }
+                    }
+                    renderCard(sellerName, location, count);
+                })
+                .catch(function() { renderCard(sellerName, location, 0); });
             }
             
-            var match = (pSeller === targetSeller || pSeller.slice(-4) === targetSeller.slice(-4));
-            
-            if (match) {
-                console.log('MATCH:', p.name, '| approved:', p.approved, '| stock:', p.stock);
-                if (p.approved === true && p.stock > 0) {
-                    count++;
-                }
-            }
-        }
-        
-        console.log('Final count:', count);
-        renderCard(sellerName, location, count);
-    })
-    .catch(function(e) {
-        console.error('Fetch error:', e);
-        renderCard(sellerName, location, 0);
-    });
-}
-            
-            // Fetch seller info then count products
             fetch(supabaseUrl + '/rest/v1/users?select=data&phone=eq.' + encodeURIComponent(shopId), {
-                headers: {
-                    'apikey': supabaseKey,
-                    'Authorization': 'Bearer ' + supabaseKey,
-                    'Accept': 'application/json'
-                }
+                headers: { 'apikey': supabaseKey, 'Authorization': 'Bearer ' + supabaseKey, 'Accept': 'application/json' }
             })
             .then(function(r) { return r.json(); })
             .then(function(users) {
-                var sellerName = 'Shop';
-                var location = 'Botswana';
-                
+                var sellerName = 'Shop', location = 'Botswana';
                 if (users && users.length > 0 && users[0].data) {
                     var u = users[0].data;
                     sellerName = u.name || u.businessName || u.sellerName || 'Shop';
                     location = u.location || u.village || u.town || u.businessLocation || 'Botswana';
                 }
-                
                 countAndRender(sellerName, location);
             })
-            .catch(function() {
-                countAndRender('Shop', 'Botswana');
-            });
+            .catch(function() { countAndRender('Shop', 'Botswana'); });
         })();
     </script>
 </body>
