@@ -1,28 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    
-    <script>
-        (function() {
-            var params = new URLSearchParams(window.location.search);
-            var productId = params.get('p');
-            if (productId) {
-                var imgUrl = 'https://fieijyaodnlaziqezkum.supabase.co/functions/v1/product-image?p=' + productId;
-                document.write('<meta property="og:image" content="' + imgUrl + '">');
-                document.write('<meta property="og:url" content="https://www.bringmine.shop/product.html?p=' + productId + '">');
-            }
-        })();
-    </script>
-    
     <title>BRINGMINE.SHOP</title>
+    
     <meta property="og:title" content="Check out this product on BRINGMINE!">
     <meta property="og:description" content="Tap to see price and details. Delivery available near you.">
+    <meta property="og:image" content="https://fieijyaodnlaziqezkum.supabase.co/functions/v1/product-image?p=P355682">
+    <meta property="og:url" content="https://www.bringmine.shop/">
     <meta property="og:type" content="product">
     <meta property="og:site_name" content="BRINGMINE.SHOP">
     <meta name="twitter:card" content="summary_large_image">
-    
   
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
